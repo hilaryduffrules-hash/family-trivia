@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Trivia Night 🎉</title>
+<style>
+  :root {
+    --bg: #0F0F2A;
+    --surface: #1a1a3e;
+    --surface2: #12122d;
+    --gold: #FFD600;
+    --r1: #29B6F6;
+    --r2: #FF7043;
+    --r3: #66BB6A;
+    --text: #FFFFFF;
+    --muted: #AAAACC;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  /* ── NAV ── */
+  #nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 24px;
+    background: var(--surface2);
+    border-bottom: 2px solid var(--gold);
+    flex-wrap: wrap;
+  }
+  #nav h1 { font-size: 1.1rem; font-weight: 700; color: var(--gold); flex: 1; white-space: nowrap; }
+  .round-btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all .2s;
+    background: transparent;
+    color: var(--text);
+  }
+  .round-btn[data-round="1"] { border-color: var(--r1); }
+  .round-btn[data-round="1"]:hover, .round-btn[data-round="1"].active { background: var(--r1); color: #000; }
+  .round-btn[data-round="2"] { border-color: var(--r2); }
+  .round-btn[data-round="2"]:hover, .round-btn[data-round="2"].active { background: var(--r2); color: #000; }
+  .round-btn[data-round="3"] { border-color: var(--r3); }
+  .round-btn[data-round="3"]:hover, .round-btn[data-round="3"].active { background: var(--r3); color: #000; }
+  #progress-label { font-size: 0.85rem; color: var(--muted); margin-left: auto; }
+
+  /* ── MAIN ── */
+  #main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    text-align: center;
+    min-height: 0;
+  }
+
+  /* ── WELCOME ── */
+  #welcome { max-width: 700px; }
+  #welcome h2 { font-size: 3rem; margin-bottom: 12px; }
+  #welcome p { color: var(--muted); margin-bottom: 32px; font-size: 1.1rem; }
+  .start-grid { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+  .start-card {
+    padding: 28px 32px;
+    border-radius: var(--radius);
+    border: 2px solid;
+    cursor: pointer;
+    transition: all .2s;
+    min-width: 180px;
+  }
+  .start-card:hover { transform: translateY(-4px); filter: brightness(1.15); }
+  .start-card .emoji { font-size: 2.5rem; margin-bottom: 8px; }
+  .start-card h3 { font-size: 1.05rem; }
+
+  /* ── ROUND HEADER ── */
+  #round-header {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: .7;
+  }
+  #q-counter {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  /* ── QUESTION CARD ── */
+  #q-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 40px 52px;
+    max-width: 860px;
+    width: 100%;
+    border: 2px solid var(--surface2);
+    margin-bottom: 28px;
+    line-height: 1.5;
+    transition: border-color .3s;
+  }
+  #q-card.r1 { border-color: var(--r1); }
+  #q-card.r2 { border-color: var(--r2); }
+  #q-card.r3 { border-color: var(--r3); }
+  #q-text {
+    font-size: 1.65rem;
+    font-weight: 600;
+    white-space: pre-line;
+    margin-bottom: 0;
+  }
+
+  /* ── ANSWER PANEL ── */
+  #a-panel {
+    background: #1c2b1c;
+    border: 2px solid var(--r3);
+    border-radius: var(--radius);
+    padding: 22px 40px;
+    max-width: 860px;
+    width: 100%;
+    margin-bottom: 28px;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity .3s, transform .3s;
+    pointer-events: none;
+  }
+  #a-panel.visible {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+  #a-panel .a-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--r3); margin-bottom: 6px; }
+  #a-text { font-size: 1.45rem; font-weight: 700; color: #a5d6a7; }
+
+  /* ── YOUTUBE PLAYER ── */
+  #yt-wrapper {
+    width: 100%;
+    max-width: 640px;
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    display: none;
+    position: relative;
+  }
+  #yt-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  /* Cover title bar area at top of YouTube player */
+  #yt-cover-top {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 52px;
+    background: #000;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  /* ── CONTROLS ── */
+  #controls { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; align-items: center; }
+  .btn {
+    padding: 12px 28px;
+    border-radius: 10px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn-reveal { background: var(--gold); color: #000; }
+  .btn-next   { background: #2e7d32; color: #fff; }
+  .btn-prev   { background: #333; color: #fff; }
+  .btn-play   { background: var(--r3); color: #000; }
+  .btn-home   { background: transparent; border: 2px solid var(--muted); color: var(--muted); }
+
+  /* ── DOTS ── */
+  #dots {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 860px;
+    margin-top: 20px;
+  }
+  .dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--muted);
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .dot.current { border-color: var(--gold); background: var(--gold); }
+  .dot.done    { background: #444; border-color: #555; }
+
+  /* ── SCOREBOARD SIDEBAR ── */
+  #score-toggle {
+    position: fixed; top: 70px; right: 0;
+    background: var(--gold); color: #000;
+    font-weight: 700; font-size: 0.8rem;
+    padding: 8px 10px;
+    border-radius: 8px 0 0 8px;
+    cursor: pointer;
+    z-index: 100;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    letter-spacing: .05em;
+  }
+  #scoreboard {
+    position: fixed; top: 0; right: -320px;
+    width: 300px; height: 100vh;
+    background: var(--surface2);
+    border-left: 2px solid var(--gold);
+    z-index: 200;
+    padding: 24px 20px;
+    transition: right .3s;
+    overflow-y: auto;
+  }
+  #scoreboard.open { right: 0; }
+  #scoreboard h3 { color: var(--gold); margin-bottom: 16px; font-size: 1.1rem; }
+  .team-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .team-name { flex: 1; font-size: 0.95rem; }
+  .team-score {
+    font-size: 1.1rem; font-weight: 700;
+    background: var(--surface); border-radius: 6px;
+    padding: 4px 12px; min-width: 44px; text-align: center;
+    color: var(--gold);
+  }
+  .score-adj { background: none; border: none; color: var(--muted); font-size: 1.1rem; cursor: pointer; padding: 2px 6px; }
+  .score-adj:hover { color: var(--gold); }
+  #add-team-row { display: flex; gap: 8px; margin-top: 16px; }
+  #new-team-name { flex: 1; background: var(--surface); border: 1px solid var(--muted); border-radius: 6px; padding: 8px; color: var(--text); font-size: 0.9rem; }
+  #add-team-btn { background: var(--gold); color: #000; border: none; border-radius: 6px; padding: 8px 14px; font-weight: 700; cursor: pointer; }
+  #score-close { position: absolute; top: 12px; right: 12px; background: none; border: none; color: var(--muted); font-size: 1.3rem; cursor: pointer; }
+
+  /* ── FULLSCREEN ── */
+  #fs-btn {
+    position: fixed; bottom: 16px; right: 16px;
+    background: rgba(255,255,255,0.1); border: none;
+    color: var(--muted); font-size: 1.2rem;
+    padding: 8px 12px; border-radius: 8px; cursor: pointer;
+    z-index: 50;
+  }
+  #fs-btn:hover { background: rgba(255,255,255,0.2); }
+
+  /* ── KEYBOARD HINT ── */
+  #kb-hint { position: fixed; bottom: 16px; left: 16px; font-size: 0.72rem; color: #555; }
+
+  @media (max-width: 600px) {
+    #q-card { padding: 24px 20px; }
+    #q-text { font-size: 1.25rem; }
+    #a-text { font-size: 1.1rem; }
+    .btn { padding: 10px 18px; font-size: 0.9rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <h1>🎉 Family Trivia Night</h1>
+  <button class="round-btn" data-round="1" onclick="startRound(1)">🧠 Round 1</button>
+  <button class="round-btn" data-round="2" onclick="startRound(2)">🎬 Round 2</button>
+  <button class="round-btn" data-round="3" onclick="startRound(3)">🎵 Round 3</button>
+  <span id="progress-label"></span>
+</nav>
+
+<!-- SCORE TOGGLE -->
+<button id="score-toggle" onclick="toggleScore()">SCORE&shy;BOARD</button>
+
+<!-- SCOREBOARD SIDEBAR -->
+<div id="scoreboard">
+  <button id="score-close" onclick="toggleScore()">✕</button>
+  <h3>🏆 Scoreboard</h3>
+  <div id="teams-list"></div>
+  <div id="add-team-row">
+    <input id="new-team-name" placeholder="Team name..." maxlength="20">
+    <button id="add-team-btn" onclick="addTeam()">+ Add</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main id="main">
+
+  <!-- WELCOME -->
+  <div id="welcome">
+    <h2>🎉 Family Trivia Night</h2>
+    <p>Three rounds. One champion. Absolutely no cheating.</p>
+    <div class="start-grid">
+      <div class="start-card" style="border-color:var(--r1)" onclick="startRound(1)">
+        <div class="emoji">🧠</div>
+        <h3>Round 1<br><small style="font-weight:400;font-size:.85rem;color:var(--muted)">General Trivia</small></h3>
+      </div>
+      <div class="start-card" style="border-color:var(--r2)" onclick="startRound(2)">
+        <div class="emoji">🎬</div>
+        <h3>Round 2<br><small style="font-weight:400;font-size:.85rem;color:var(--muted)">Cartoons & Movies</small></h3>
+      </div>
+      <div class="start-card" style="border-color:var(--r3)" onclick="startRound(3)">
+        <div class="emoji">🎵</div>
+        <h3>Round 3<br><small style="font-weight:400;font-size:.85rem;color:var(--muted)">Name That Tune</small></h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUESTION VIEW (hidden initially) -->
+  <div id="question-view" style="display:none; width:100%; max-width:900px; display:none; flex-direction:column; align-items:center;">
+    <div id="round-header"></div>
+    <div id="q-counter"></div>
+    <div id="yt-wrapper">
+      <div id="yt-cover-top"></div>
+      <iframe id="yt-frame" allowfullscreen
+        allow="autoplay; encrypted-media"
+        src="about:blank"></iframe>
+    </div>
+    <div id="q-card"><div id="q-text"></div></div>
+    <div id="a-panel"><div class="a-label">✅ Answer</div><div id="a-text"></div></div>
+    <div id="controls">
+      <button class="btn btn-prev" onclick="prevQ()">← Prev</button>
+      <button class="btn btn-reveal" onclick="revealAnswer()">Reveal Answer</button>
+      <button class="btn btn-play" id="play-btn" onclick="playClip()" style="display:none">▶ Play Clip</button>
+      <button class="btn btn-next" onclick="nextQ()">Next →</button>
+      <button class="btn btn-home" onclick="goHome()">🏠</button>
+    </div>
+    <div id="dots"></div>
+  </div>
+
+</main>
+
+<!-- FULLSCREEN BTN -->
+<button id="fs-btn" onclick="toggleFS()" title="Fullscreen">⛶</button>
+<div id="kb-hint">← → Space=reveal  F=fullscreen  S=scoreboard</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────────────────────────────────────
+const ROUND1 = [
+  ["What year did the Berlin Wall fall?", "1989"],
+  ["Which chemical element has the symbol Au?", "Gold"],
+  ["How many bones are in the adult human body?", "206"],
+  ["What is the only country in the world that borders both France and Spain?", "Andorra"],
+  ["What is the powerhouse of the cell?", "The mitochondria"],
+  ["What year did the first iPhone launch?", "2007"],
+  ["Which Shakespeare play features the line 'Et tu, Brute'?", "Julius Caesar"],
+  ["What is the largest desert in the world by total area?", "Antarctica — it's a cold desert! (Sahara is the largest hot desert)"],
+  ["What is the longest bone in the human body?", "The femur (thigh bone)"],
+  ["Which country gifted the Statue of Liberty to the United States?", "France"],
+  ["How many sides does a dodecagon have?", "12"],
+  ["Which planet has the most confirmed moons in our solar system?", "Saturn (146+ confirmed moons)"],
+  ["What year did Google officially launch?", "1998"],
+  ["What is the most consumed beverage in the world after water?", "Tea"],
+  ["In Morse code, what does ··· — ··· represent?", "SOS"],
+];
+
+const ROUND2 = [
+  ["In Avatar: The Last Airbender, what is the name of Aang's flying sky bison?", "Appa"],
+  ["What year did the original Toy Story release in theatres?", "1995"],
+  ["Who voiced Genie in the original 1992 Aladdin?", "Robin Williams"],
+  ["In The Incredibles, what is Syndrome's real birth name?", "Buddy Pine"],
+  ["In Ratatouille, what is the name of the legendary chef Remy idolizes?", "Auguste Gusteau"],
+  ["What is the full name of the bully kid in the original Toy Story?", "Sid Phillips"],
+  ["In Kim Possible, what is the name of her naked mole rat sidekick?", "Rufus"],
+  ["What does WALL-E stand for?", "Waste Allocation Load Lifter: Earth-Class"],
+  ["In The Lion King, what type of animal is Timon?", "A meerkat"],
+  ["Name all 5 original emotions in Pixar's Inside Out.", "Joy, Sadness, Anger, Fear, Disgust"],
+  ["In Rugrats, what is the name of Angelica's favourite doll?", "Cynthia"],
+  ["In SpongeBob SquarePants, who is the owner of the Krusty Krab?", "Mr. Krabs (Eugene Krabs)"],
+  ["In Encanto, what is the name of the Madrigal family's magical home?", "Casita"],
+  ["What is the name of Bluey's dad?", "Bandit"],
+  ["In Phineas and Ferb, what does Dr. Doofenshmirtz's jingle always end with?", '"Doofenshmirtz Evil Incorporated!"'],
+];
+
+// Round 3: [hint_lyric, answer, youtube_id, start_sec]
+const ROUND3 = [
+  [
+    '🎵  "The men up there don\'t like a lot of blabber,\nthey think a girl who gossips is a bore!"\n\nName the song & movie!',
+    '"Poor Unfortunate Souls" – Ursula / The Little Mermaid (1989)',
+    "lOyy887d4vs", 30
+  ],
+  [
+    '🎵  "For years I\'ve roamed these empty halls,\nwhy have a ballroom with no balls?"\n\nName the song & movie!',
+    '"For the First Time in Forever" – Anna / Frozen (2013)',
+    "ZrX1XKtShSI", 20
+  ],
+  [
+    '🎵  "If there\'s a prize for rotten judgement,\nI guess I\'ve already won that!"\n\nName the song & movie!',
+    '"I Won\'t Say (I\'m in Love)" – Megara / Hercules (1997)',
+    "DPMjsfJwUow", 15
+  ],
+  [
+    '🎵  "There\'s a calm surrender\nto the rush of day…"\n\nName the song & movie!',
+    '"Can You Feel the Love Tonight" – The Lion King (1994)',
+    "25QyCxVkXwQ", 10
+  ],
+  [
+    '🎵  "You think you own whatever land you land on,\nthe earth is just a dead thing you can claim…"\n\nName the song & movie!',
+    '"Colors of the Wind" – Pocahontas (1995)',
+    "9ThO76peOw0", 8
+  ],
+  [
+    '🎵  "I have often dreamed\nof a far-off place,\nwhere a great warm welcome\nwill be waiting for me…"\n\nName the song & movie!',
+    '"Go the Distance" – Hercules (1997)',
+    "zgnHF2CwrPs", 12
+  ],
+  [
+    '🎵  "Well Ali Baba had them forty thieves,\nScheherazade had a thousand tales…"\n\nName the song & movie!',
+    '"Friend Like Me" – Genie / Aladdin (1992)',
+    "qsrGi_d-fW8", 18
+  ],
+  [
+    '🎵  "I\'ve been staring at the edge of the water,\nlong as I can remember, never really knowing why…"\n\nName the song & movie!',
+    '"How Far I\'ll Go" – Auli\'i Cravalho / Moana (2016)',
+    "cPAbx5kgCJo", 5
+  ],
+  [
+    '🎵  "Well Tamatoa hasn\'t always been this glam,\nI was a drab little crab once…"\n\nName the song & movie!',
+    '"Shiny" – Tamatoa / Moana (2016)',
+    "93lrosBEW-Q", 20
+  ],
+  [
+    '🎵  "When somebody loved me,\neverything was beautiful…\nEvery hour we spent together\nlives within my heart…"\n\nName the song & movie!',
+    '"When She Loved Me" – Sarah McLachlan / Toy Story 2 (1999)',
+    "czmjVFxxNDw", 8
+  ],
+  [
+    '🎵  "Boys and girls of every age,\nwouldn\'t you like to see something strange?"\n\nName the song & movie!',
+    '"This Is Halloween" – The Nightmare Before Christmas (1993)',
+    "ZVuToMilP0A", 5
+  ],
+  [
+    '🎵  "I\'m the strong one, I\'m not nervous,\nI am fine with where I am…"\n\nName the song & movie!',
+    '"Surface Pressure" – Luisa / Encanto (2021)',
+    "tQwVKr8rCYw", 25
+  ],
+  [
+    '🎵  "I messed up tonight,\nI lost another fight…\nI\'ll try everything!"\n\nName the song & movie!',
+    '"Try Everything" – Shakira / Zootopia (2016)',
+    "c6rP-YP4c5I", 10
+  ],
+  [
+    '🎵  "You are my greatest gift,\nI wrapped you in clover,\nI kept you safe and warm…"\n\nName the song & movie!',
+    '"Mother Knows Best" – Mother Gothel / Tangled (2010)',
+    "-7jWt3JvJto", 15
+  ],
+  [
+    '🎵  "When the wind is in my hair,\nand the fire\'s in the air,\nI know my destiny\'s there…"\n\nName the song & movie!',
+    '"Touch the Sky" – Brave / Pixar (2012)',
+    "k-RcmWV7InU", 12
+  ],
+];
+
+const ROUNDS = [null, ROUND1, ROUND2, ROUND3];
+const ROUND_COLORS = [null, 'r1', 'r2', 'r3'];
+const ROUND_TITLES = [null, '🧠 Round 1 — General Trivia', '🎬 Round 2 — Cartoons & Movies', '🎵 Round 3 — Name That Tune'];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────────────
+let currentRound = 0;
+let currentQ = 0;
+let answered = {};  // "round-q" → true
+let teams = JSON.parse(localStorage.getItem('trivia_teams') || '[]');
+let scoreOpen = false;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ROUTING
+// ─────────────────────────────────────────────────────────────────────────────
+function goHome() {
+  stopYT();
+  currentRound = 0;
+  document.getElementById('welcome').style.display = 'block';
+  document.getElementById('question-view').style.display = 'none';
+  document.getElementById('progress-label').textContent = '';
+  document.querySelectorAll('.round-btn').forEach(b => b.classList.remove('active'));
+}
+
+function startRound(r) {
+  currentRound = r;
+  currentQ = 0;
+  document.getElementById('welcome').style.display = 'none';
+  const qv = document.getElementById('question-view');
+  qv.style.display = 'flex';
+  document.querySelectorAll('.round-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.round) === r);
+  });
+  renderQuestion();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────────────────────────────────────
+function renderQuestion() {
+  stopYT();
+  const data = ROUNDS[currentRound];
+  const total = data.length;
+  const row = data[currentQ];
+  const isR3 = currentRound === 3;
+  const key = `${currentRound}-${currentQ}`;
+  const wasAnswered = answered[key];
+
+  // Header & counter
+  document.getElementById('round-header').textContent = ROUND_TITLES[currentRound];
+  document.getElementById('round-header').style.color = `var(--${ROUND_COLORS[currentRound]})`;
+  document.getElementById('q-counter').textContent = `Question ${currentQ + 1} of ${total}`;
+  document.getElementById('progress-label').textContent = `Q ${currentQ+1}/${total}`;
+
+  // Card colour
+  const card = document.getElementById('q-card');
+  card.className = ROUND_COLORS[currentRound];
+
+  // Question text
+  const qText = isR3 ? row[0] : row[0];
+  document.getElementById('q-text').textContent = qText;
+
+  // Answer
+  const aText = isR3 ? row[1] : row[1];
+  document.getElementById('a-text').textContent = aText;
+  const ap = document.getElementById('a-panel');
+  if (wasAnswered) {
+    ap.classList.add('visible');
+  } else {
+    ap.classList.remove('visible');
+  }
+
+  // YouTube player
+  const ytw = document.getElementById('yt-wrapper');
+  const playBtn = document.getElementById('play-btn');
+  if (isR3) {
+    ytw.style.display = 'block';
+    playBtn.style.display = 'inline-block';
+    // Load player paused at start time
+    loadYT(row[2], row[3]);
+  } else {
+    ytw.style.display = 'none';
+    playBtn.style.display = 'none';
+  }
+
+  // Dots
+  renderDots(total);
+}
+
+function renderDots(total) {
+  const container = document.getElementById('dots');
+  container.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === currentQ ? ' current' : '') + (answered[`${currentRound}-${i}`] ? ' done' : '');
+    d.title = `Q${i+1}`;
+    d.onclick = (e => { const idx = i; return () => { stopYT(); currentQ = idx; renderQuestion(); }; })(i);
+    container.appendChild(d);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────────────────────────────────────
+function nextQ() {
+  const total = ROUNDS[currentRound].length;
+  if (currentQ < total - 1) { currentQ++; renderQuestion(); }
+}
+function prevQ() {
+  if (currentQ > 0) { currentQ--; renderQuestion(); }
+}
+function revealAnswer() {
+  const key = `${currentRound}-${currentQ}`;
+  answered[key] = true;
+  document.getElementById('a-panel').classList.add('visible');
+  renderDots(ROUNDS[currentRound].length);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// YOUTUBE
+// ─────────────────────────────────────────────────────────────────────────────
+let ytLoaded = false;
+function loadYT(videoId, startSec) {
+  const frame = document.getElementById('yt-frame');
+  // Load paused; user clicks Play Clip to start
+  frame.src = `https://www.youtube-nocookie.com/embed/${videoId}?start=${startSec}&autoplay=0&rel=0&modestbranding=1&controls=1&fs=0`;
+}
+function playClip() {
+  const row = ROUND3[currentQ];
+  const frame = document.getElementById('yt-frame');
+  frame.src = `https://www.youtube-nocookie.com/embed/${row[2]}?start=${row[3]}&autoplay=1&rel=0&modestbranding=1&controls=1&fs=0`;
+}
+function stopYT() {
+  const frame = document.getElementById('yt-frame');
+  if (frame) frame.src = 'about:blank';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SCOREBOARD
+// ─────────────────────────────────────────────────────────────────────────────
+function toggleScore() {
+  scoreOpen = !scoreOpen;
+  document.getElementById('scoreboard').classList.toggle('open', scoreOpen);
+  renderTeams();
+}
+function saveTeams() { localStorage.setItem('trivia_teams', JSON.stringify(teams)); }
+function addTeam() {
+  const inp = document.getElementById('new-team-name');
+  const name = inp.value.trim();
+  if (!name) return;
+  teams.push({ name, score: 0 });
+  inp.value = '';
+  saveTeams();
+  renderTeams();
+}
+function adjustScore(i, delta) {
+  teams[i].score = Math.max(0, teams[i].score + delta);
+  saveTeams();
+  renderTeams();
+}
+function removeTeam(i) {
+  if (confirm(`Remove ${teams[i].name}?`)) {
+    teams.splice(i, 1);
+    saveTeams();
+    renderTeams();
+  }
+}
+function renderTeams() {
+  const sorted = [...teams].map((t,i)=>({...t,_i:i})).sort((a,b)=>b.score-a.score);
+  const list = document.getElementById('teams-list');
+  list.innerHTML = sorted.map(t => `
+    <div class="team-row">
+      <span class="team-name">${t.name}</span>
+      <button class="score-adj" onclick="adjustScore(${t._i},-1)">−</button>
+      <span class="team-score">${t.score}</span>
+      <button class="score-adj" onclick="adjustScore(${t._i},1)">+</button>
+      <button class="score-adj" onclick="removeTeam(${t._i})" style="color:#e57373">✕</button>
+    </div>
+  `).join('');
+}
+renderTeams();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// KEYBOARD
+// ─────────────────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (currentRound === 0) return;
+  switch(e.key) {
+    case 'ArrowRight': case 'l': nextQ(); break;
+    case 'ArrowLeft':  case 'h': prevQ(); break;
+    case ' ': case 'Enter': e.preventDefault(); revealAnswer(); break;
+    case 'p': case 'P': if(currentRound===3) playClip(); break;
+    case 'f': case 'F': toggleFS(); break;
+    case 's': case 'S': toggleScore(); break;
+    case '1': startRound(1); break;
+    case '2': startRound(2); break;
+    case '3': startRound(3); break;
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FULLSCREEN
+// ─────────────────────────────────────────────────────────────────────────────
+function toggleFS() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(()=>{});
+  } else {
+    document.exitFullscreen().catch(()=>{});
+  }
+}
+</script>
+</body>
+</html>
