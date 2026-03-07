@@ -144,31 +144,42 @@
   #a-panel .a-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--r3); margin-bottom: 6px; }
   #a-text { font-size: 1.45rem; font-weight: 700; color: #a5d6a7; }
 
-  /* ── YOUTUBE PLAYER ── */
-  #yt-wrapper {
-    width: 100%;
-    max-width: 640px;
-    aspect-ratio: 16/9;
-    background: #000;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 20px;
+  /* ── AUDIO PLAYER ── */
+  #audio-player {
     display: none;
-    position: relative;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
   }
-  #yt-wrapper iframe {
-    width: 100%;
-    height: 100%;
-    border: 0;
+  #audio-play-btn {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    border: none;
+    background: var(--r3);
+    color: #0a2e0a;
+    font-size: 2.4rem;
+    cursor: pointer;
+    transition: all .2s;
+    box-shadow: 0 4px 24px rgba(102,187,106,0.4);
+    display: flex; align-items: center; justify-content: center;
   }
-  /* Cover title bar area at top of YouTube player */
-  #yt-cover-top {
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 52px;
-    background: #000;
-    z-index: 10;
-    pointer-events: none;
+  #audio-play-btn:hover { transform: scale(1.07); filter: brightness(1.12); }
+  #audio-play-btn.playing {
+    background: #FF7043;
+    color: #fff;
+    box-shadow: 0 4px 28px rgba(255,112,67,0.55);
+    animation: pulse-btn 1.3s ease-in-out infinite;
+  }
+  @keyframes pulse-btn {
+    0%,100% { box-shadow: 0 4px 24px rgba(255,112,67,0.45); }
+    50%      { box-shadow: 0 6px 36px rgba(255,112,67,0.8); }
+  }
+  #audio-status {
+    font-size: 0.85rem;
+    color: var(--muted);
+    letter-spacing: .04em;
+    min-height: 1.2em;
   }
 
   /* ── CONTROLS ── */
@@ -323,18 +334,17 @@
   <div id="question-view" style="display:none; width:100%; max-width:900px; display:none; flex-direction:column; align-items:center;">
     <div id="round-header"></div>
     <div id="q-counter"></div>
-    <div id="yt-wrapper">
-      <div id="yt-cover-top"></div>
-      <iframe id="yt-frame" allowfullscreen
-        allow="autoplay; encrypted-media"
-        src="about:blank"></iframe>
+    <div id="audio-player">
+      <button id="audio-play-btn" onclick="toggleAudio()">▶</button>
+      <div id="audio-status"></div>
     </div>
+    <audio id="audio-el" preload="none"></audio>
     <div id="q-card"><div id="q-text"></div></div>
     <div id="a-panel"><div class="a-label">✅ Answer</div><div id="a-text"></div></div>
     <div id="controls">
       <button class="btn btn-prev" onclick="prevQ()">← Prev</button>
       <button class="btn btn-reveal" onclick="revealAnswer()">Reveal Answer</button>
-      <button class="btn btn-play" id="play-btn" onclick="playClip()" style="display:none">▶ Play Clip</button>
+      <button class="btn btn-play" id="play-btn" style="display:none">▶ Play Clip</button>
       <button class="btn btn-next" onclick="nextQ()">Next →</button>
       <button class="btn btn-home" onclick="goHome()">🏠</button>
     </div>
@@ -387,82 +397,83 @@ const ROUND2 = [
   ["In Phineas and Ferb, what does Dr. Doofenshmirtz's jingle always end with?", '"Doofenshmirtz Evil Incorporated!"'],
 ];
 
-// Round 3: [hint_lyric, answer, youtube_id, start_sec]
+// Round 3: [hint_lyric, answer, clip_file]
+// Clips are pre-trimmed — already start past the title lyric
 const ROUND3 = [
   [
     '🎵  "The men up there don\'t like a lot of blabber,\nthey think a girl who gossips is a bore!"\n\nName the song & movie!',
     '"Poor Unfortunate Souls" – Ursula / The Little Mermaid (1989)',
-    "lOyy887d4vs", 30
+    "audio/clip_01.mp3"
   ],
   [
     '🎵  "For years I\'ve roamed these empty halls,\nwhy have a ballroom with no balls?"\n\nName the song & movie!',
     '"For the First Time in Forever" – Anna / Frozen (2013)',
-    "ZrX1XKtShSI", 20
+    "audio/clip_02.mp3"
   ],
   [
     '🎵  "If there\'s a prize for rotten judgement,\nI guess I\'ve already won that!"\n\nName the song & movie!',
     '"I Won\'t Say (I\'m in Love)" – Megara / Hercules (1997)',
-    "DPMjsfJwUow", 15
+    "audio/clip_03.mp3"
   ],
   [
     '🎵  "There\'s a calm surrender\nto the rush of day…"\n\nName the song & movie!',
     '"Can You Feel the Love Tonight" – The Lion King (1994)',
-    "25QyCxVkXwQ", 10
+    "audio/clip_04.mp3"
   ],
   [
     '🎵  "You think you own whatever land you land on,\nthe earth is just a dead thing you can claim…"\n\nName the song & movie!',
     '"Colors of the Wind" – Pocahontas (1995)',
-    "9ThO76peOw0", 8
+    "audio/clip_05.mp3"
   ],
   [
     '🎵  "I have often dreamed\nof a far-off place,\nwhere a great warm welcome\nwill be waiting for me…"\n\nName the song & movie!',
     '"Go the Distance" – Hercules (1997)',
-    "zgnHF2CwrPs", 12
+    "audio/clip_06.mp3"
   ],
   [
     '🎵  "Well Ali Baba had them forty thieves,\nScheherazade had a thousand tales…"\n\nName the song & movie!',
     '"Friend Like Me" – Genie / Aladdin (1992)',
-    "qsrGi_d-fW8", 18
+    "audio/clip_07.mp3"
   ],
   [
     '🎵  "I\'ve been staring at the edge of the water,\nlong as I can remember, never really knowing why…"\n\nName the song & movie!',
     '"How Far I\'ll Go" – Auli\'i Cravalho / Moana (2016)',
-    "cPAbx5kgCJo", 5
+    "audio/clip_08.mp3"
   ],
   [
     '🎵  "Well Tamatoa hasn\'t always been this glam,\nI was a drab little crab once…"\n\nName the song & movie!',
     '"Shiny" – Tamatoa / Moana (2016)',
-    "93lrosBEW-Q", 20
+    "audio/clip_09.mp3"
   ],
   [
     '🎵  "When somebody loved me,\neverything was beautiful…\nEvery hour we spent together\nlives within my heart…"\n\nName the song & movie!',
     '"When She Loved Me" – Sarah McLachlan / Toy Story 2 (1999)',
-    "czmjVFxxNDw", 8
+    "audio/clip_10.mp3"
   ],
   [
     '🎵  "Boys and girls of every age,\nwouldn\'t you like to see something strange?"\n\nName the song & movie!',
     '"This Is Halloween" – The Nightmare Before Christmas (1993)',
-    "ZVuToMilP0A", 5
+    "audio/clip_11.mp3"
   ],
   [
     '🎵  "I\'m the strong one, I\'m not nervous,\nI am fine with where I am…"\n\nName the song & movie!',
     '"Surface Pressure" – Luisa / Encanto (2021)',
-    "tQwVKr8rCYw", 25
+    "audio/clip_12.mp3"
   ],
   [
     '🎵  "I messed up tonight,\nI lost another fight…\nI\'ll try everything!"\n\nName the song & movie!',
     '"Try Everything" – Shakira / Zootopia (2016)',
-    "c6rP-YP4c5I", 10
+    "audio/clip_13.mp3"
   ],
   [
     '🎵  "You are my greatest gift,\nI wrapped you in clover,\nI kept you safe and warm…"\n\nName the song & movie!',
     '"Mother Knows Best" – Mother Gothel / Tangled (2010)',
-    "-7jWt3JvJto", 15
+    "audio/clip_14.mp3"
   ],
   [
     '🎵  "When the wind is in my hair,\nand the fire\'s in the air,\nI know my destiny\'s there…"\n\nName the song & movie!',
     '"Touch the Sky" – Brave / Pixar (2012)',
-    "k-RcmWV7InU", 12
+    "audio/clip_15.mp3"
   ],
 ];
 
@@ -483,7 +494,7 @@ let scoreOpen = false;
 // ROUTING
 // ─────────────────────────────────────────────────────────────────────────────
 function goHome() {
-  stopYT();
+  stopAudio();
   currentRound = 0;
   document.getElementById('welcome').style.display = 'block';
   document.getElementById('question-view').style.display = 'none';
@@ -507,7 +518,7 @@ function startRound(r) {
 // RENDER
 // ─────────────────────────────────────────────────────────────────────────────
 function renderQuestion() {
-  stopYT();
+  stopAudio();
   const data = ROUNDS[currentRound];
   const total = data.length;
   const row = data[currentQ];
@@ -539,17 +550,18 @@ function renderQuestion() {
     ap.classList.remove('visible');
   }
 
-  // YouTube player
-  const ytw = document.getElementById('yt-wrapper');
+  // Audio player
+  const audioPlayer = document.getElementById('audio-player');
   const playBtn = document.getElementById('play-btn');
+  playBtn.style.display = 'none';
   if (isR3) {
-    ytw.style.display = 'block';
-    playBtn.style.display = 'inline-block';
-    // Load player paused at start time
-    loadYT(row[2], row[3]);
+    audioPlayer.style.display = 'flex';
+    const audioEl = document.getElementById('audio-el');
+    audioEl.src = row[2];
+    audioEl.load();
+    document.getElementById('audio-status').textContent = '';
   } else {
-    ytw.style.display = 'none';
-    playBtn.style.display = 'none';
+    audioPlayer.style.display = 'none';
   }
 
   // Dots
@@ -563,7 +575,7 @@ function renderDots(total) {
     const d = document.createElement('div');
     d.className = 'dot' + (i === currentQ ? ' current' : '') + (answered[`${currentRound}-${i}`] ? ' done' : '');
     d.title = `Q${i+1}`;
-    d.onclick = (e => { const idx = i; return () => { stopYT(); currentQ = idx; renderQuestion(); }; })(i);
+    d.onclick = (e => { const idx = i; return () => { stopAudio(); currentQ = idx; renderQuestion(); }; })(i);
     container.appendChild(d);
   }
 }
@@ -586,22 +598,37 @@ function revealAnswer() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// YOUTUBE
+// AUDIO
 // ─────────────────────────────────────────────────────────────────────────────
-let ytLoaded = false;
-function loadYT(videoId, startSec) {
-  const frame = document.getElementById('yt-frame');
-  // Load paused; user clicks Play Clip to start
-  frame.src = `https://www.youtube-nocookie.com/embed/${videoId}?start=${startSec}&autoplay=0&rel=0&modestbranding=1&controls=1&fs=0`;
+function toggleAudio() {
+  const audioEl = document.getElementById('audio-el');
+  const btn     = document.getElementById('audio-play-btn');
+  const status  = document.getElementById('audio-status');
+  if (audioEl.paused) {
+    audioEl.play().catch(err => { status.textContent = 'Playback error: ' + err.message; });
+    btn.textContent = '⏹';
+    btn.classList.add('playing');
+    status.textContent = '♪  Now playing…';
+    audioEl.onended = () => {
+      btn.textContent = '▶';
+      btn.classList.remove('playing');
+      status.textContent = '✓  Done';
+    };
+  } else {
+    audioEl.pause();
+    audioEl.currentTime = 0;
+    btn.textContent = '▶';
+    btn.classList.remove('playing');
+    status.textContent = '';
+  }
 }
-function playClip() {
-  const row = ROUND3[currentQ];
-  const frame = document.getElementById('yt-frame');
-  frame.src = `https://www.youtube-nocookie.com/embed/${row[2]}?start=${row[3]}&autoplay=1&rel=0&modestbranding=1&controls=1&fs=0`;
-}
-function stopYT() {
-  const frame = document.getElementById('yt-frame');
-  if (frame) frame.src = 'about:blank';
+function stopAudio() {
+  const audioEl = document.getElementById('audio-el');
+  const btn     = document.getElementById('audio-play-btn');
+  const status  = document.getElementById('audio-status');
+  if (audioEl) { audioEl.pause(); audioEl.currentTime = 0; audioEl.src = ''; }
+  if (btn)     { btn.textContent = '▶'; btn.classList.remove('playing'); }
+  if (status)  { status.textContent = ''; }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -659,7 +686,7 @@ document.addEventListener('keydown', e => {
     case 'ArrowRight': case 'l': nextQ(); break;
     case 'ArrowLeft':  case 'h': prevQ(); break;
     case ' ': case 'Enter': e.preventDefault(); revealAnswer(); break;
-    case 'p': case 'P': if(currentRound===3) playClip(); break;
+    case 'p': case 'P': if(currentRound===3) toggleAudio(); break;
     case 'f': case 'F': toggleFS(); break;
     case 's': case 'S': toggleScore(); break;
     case '1': startRound(1); break;
