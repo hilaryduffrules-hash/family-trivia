@@ -3,6 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  // Password gate — runs before anything renders
+  (function() {
+    const PASS = 'hilary21';
+    const KEY  = 'trivia_auth';
+    if (sessionStorage.getItem(KEY) !== '1') {
+      document.addEventListener('DOMContentLoaded', function() {
+        document.body.style.display = 'none';
+        var gate = document.createElement('div');
+        gate.id = 'gate';
+        gate.innerHTML = [
+          '<style>',
+          '#gate{position:fixed;inset:0;background:#0F0F2A;display:flex;flex-direction:column;',
+          'align-items:center;justify-content:center;z-index:99999;font-family:Segoe UI,system-ui,sans-serif;color:#fff;}',
+          '#gate h2{font-size:2rem;margin-bottom:8px;color:#FFD600;}',
+          '#gate p{color:#AAAACC;margin-bottom:32px;font-size:1rem;}',
+          '#gate-form{display:flex;flex-direction:column;align-items:center;gap:16px;}',
+          '#gate-input{background:#1a1a3e;border:2px solid #444;border-radius:10px;',
+          'color:#fff;font-size:1.2rem;padding:14px 24px;width:260px;text-align:center;outline:none;}',
+          '#gate-input:focus{border-color:#FFD600;}',
+          '#gate-btn{background:#FFD600;color:#000;border:none;border-radius:10px;',
+          'font-size:1rem;font-weight:700;padding:13px 40px;cursor:pointer;width:260px;}',
+          '#gate-btn:hover{filter:brightness(1.1);}',
+          '#gate-err{color:#FF7043;font-size:0.9rem;min-height:1.2em;}',
+          '</style>',
+          '<h2>🎉 Family Trivia Night</h2>',
+          '<p>Enter the password to continue</p>',
+          '<div id="gate-form">',
+          '<input id="gate-input" type="password" placeholder="Password" autocomplete="off">',
+          '<button id="gate-btn" onclick="checkPass()">Enter</button>',
+          '<div id="gate-err"></div>',
+          '</div>'
+        ].join('');
+        document.body.appendChild(gate);
+        document.body.style.display = '';
+        document.getElementById('gate-input').addEventListener('keydown', function(e){
+          if(e.key==='Enter') checkPass();
+        });
+        setTimeout(function(){ document.getElementById('gate-input').focus(); }, 50);
+      });
+    }
+    window.checkPass = function() {
+      var val = document.getElementById('gate-input').value;
+      if (val === PASS) {
+        sessionStorage.setItem(KEY, '1');
+        document.getElementById('gate').remove();
+      } else {
+        var err = document.getElementById('gate-err');
+        err.textContent = 'Wrong password — try again.';
+        document.getElementById('gate-input').value = '';
+        document.getElementById('gate-input').focus();
+        setTimeout(function(){ err.textContent=''; }, 3000);
+      }
+    };
+  })();
+</script>
 <title>Family Trivia Night 🎉</title>
 <style>
   :root {
