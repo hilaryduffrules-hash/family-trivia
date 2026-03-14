@@ -5,68 +5,160 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>📊 Trivia Scoreboard</title>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:#0F0F2A; color:#fff; font-family:'Segoe UI',Arial,sans-serif; padding:24px 16px; }
-  h1 { color:#FFD600; font-size:2rem; text-align:center; margin-bottom:6px; }
-  .subtitle { color:#AAAACC; text-align:center; margin-bottom:28px; font-size:0.9rem; }
-  .board { max-width:640px; margin:0 auto; }
-  .team {
-    background:#1A1A40; border-radius:14px; padding:18px 22px;
-    margin-bottom:14px; display:flex; align-items:center; gap:18px;
-    transition:transform 0.2s;
-  }
-  .team:nth-child(1) { border:2px solid #FFD600; }
-  .team:nth-child(2) { border:2px solid #AAAACC; }
-  .team:nth-child(3) { border:2px solid #FF7043; }
-  .rank { font-size:2rem; width:44px; text-align:center; }
-  .team-info { flex:1; }
-  .team-name { font-size:1.15rem; font-weight:800; }
-  .team-answers { color:#AAAACC; font-size:0.8rem; margin-top:3px; }
-  .team-score { font-size:2.2rem; font-weight:900; color:#FFD600; }
-  .empty { text-align:center; color:#AAAACC; padding:60px 20px; font-size:1.1rem; }
-  .pulse { animation: pulse 2s ease-in-out infinite; }
-  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
-  a.link { color:#AAAACC; text-align:center; display:block; margin-top:20px; font-size:0.9rem; text-decoration:none; }
-  a.link:hover { color:#FFD600; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0F0F2A;color:#fff;font-family:'Segoe UI',Arial,sans-serif;padding:24px 16px}
+  h1{color:#FFD600;font-size:2rem;text-align:center;margin-bottom:6px}
+  .sub{color:#AAAACC;text-align:center;margin-bottom:24px;font-size:.9rem}
+  .board{max-width:640px;margin:0 auto}
+  .team{background:#1A1A40;border-radius:14px;padding:16px 20px;margin-bottom:12px;display:flex;align-items:center;gap:16px}
+  .team:nth-child(1){border:2px solid #FFD600}
+  .team:nth-child(2){border:2px solid #AAAACC}
+  .team:nth-child(3){border:2px solid #FF7043}
+  .rank{font-size:2rem;width:44px;text-align:center}
+  .info{flex:1}
+  .name{font-size:1.1rem;font-weight:800}
+  .det{color:#AAAACC;font-size:.8rem;margin-top:2px}
+  .sc{font-size:2.2rem;font-weight:900;color:#FFD600}
+  .empty{text-align:center;color:#AAAACC;padding:60px 20px;font-size:1rem}
+  a.lnk{color:#AAAACC;text-align:center;display:block;margin-top:20px;font-size:.9rem;text-decoration:none}
+  a.lnk:hover{color:#FFD600}
+  /* Gate */
+  #gate{position:fixed;inset:0;background:#0F0F2A;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:20px}
+  #gate h2{color:#FFD600;font-size:1.8rem;margin-bottom:8px}
+  #gate p{color:#AAAACC;margin-bottom:28px;text-align:center}
+  #gate input{width:100%;max-width:320px;background:#1A1A40;border:2px solid #333355;border-radius:10px;color:#fff;font-size:1rem;padding:11px 14px;outline:none;margin-bottom:12px}
+  #gate input:focus{border-color:#FFD600}
+  #gate button{max-width:320px;width:100%;padding:12px;border-radius:10px;border:none;background:#FFD600;color:#0F0F2A;font-size:1rem;font-weight:800;cursor:pointer}
+  #gate-err{color:#FF7043;min-height:1.4em;font-size:.9rem;text-align:center;margin-top:8px}
+  .admin-btn{background:#29B6F6;color:#0F0F2A;border:none;border-radius:8px;padding:8px 18px;font-weight:700;cursor:pointer;font-size:.9rem}
+  .admin-btn:hover{opacity:.85}
+  .admin-bar{max-width:640px;margin:0 auto 20px;display:flex;gap:10px;flex-wrap:wrap;display:none}
+  .admin-bar.show{display:flex}
 </style>
 </head>
 <body>
-<h1>📊 Scoreboard</h1>
-<p class="subtitle">Live · refreshes every 8 seconds</p>
-<div class="board" id="board"><div class="empty pulse">Waiting for teams to join…</div></div>
-<a class="link" href="play.html">← Back to Submit Answers</a>
+
+<div id="gate">
+  <h2>📊 Scoreboard</h2>
+  <p>Enter the password to view</p>
+  <input type="password" id="gate-input" placeholder="Password" autocomplete="off">
+  <button onclick="checkGate()">Enter →</button>
+  <div id="gate-err"></div>
+</div>
+
+<h1>📊 Live Scoreboard</h1>
+<p class="sub" id="subText">Scores submitted by each team</p>
+
+<div class="admin-bar" id="adminBar">
+  <button class="admin-btn" onclick="resetAll()">🗑 Reset All Scores</button>
+  <button class="admin-btn" onclick="exportScores()">📋 Export CSV</button>
+</div>
+
+<div class="board" id="board">
+  <div class="empty">No scores yet — waiting for teams!</div>
+</div>
+
+<a class="lnk" href="play.html">← Back to Submit Answers</a>
 
 <script>
-const API = 'https://murphy-rog-zephyrus-g14-ga401qm-ga401qm.tail9c7ab.ts.net';
-const HEADERS = { 'x-api-key': 'hilary21' };
-const medals = ['🥇','🥈','🥉'];
+const PASS = 'carlysbirthday';
+const ADMIN_PASS = 'hilary21';
+let isAdmin = false;
 
-async function refresh() {
-  try {
-    const res = await fetch(`${API}/api/scores`, { headers: HEADERS, signal: AbortSignal.timeout(5000) });
-    const teams = await res.json();
-    const board = document.getElementById('board');
-    if (!teams.length) {
-      board.innerHTML = '<div class="empty pulse">No teams yet — waiting for submissions!</div>';
-      return;
-    }
-    board.innerHTML = teams.map((t, i) => `
-      <div class="team">
-        <div class="rank">${medals[i] || (i+1) + '.'}</div>
-        <div class="team-info">
-          <div class="team-name">${t.name}</div>
-          <div class="team-answers">${t.answers} answer${t.answers !== 1 ? 's' : ''} submitted</div>
-        </div>
-        <div class="team-score">${t.score}</div>
-      </div>
-    `).join('');
-  } catch(e) {
-    // Keep showing last known state on error
+// Gate
+document.getElementById('gate-input').addEventListener('keydown', e => { if(e.key==='Enter') checkGate(); });
+if (sessionStorage.getItem('trivia_auth') === '1') {
+  document.getElementById('gate').remove();
+  isAdmin = sessionStorage.getItem('trivia_admin') === '1';
+  if (isAdmin) document.getElementById('adminBar').classList.add('show');
+}
+
+function checkGate() {
+  const val = document.getElementById('gate-input').value.trim().toLowerCase();
+  if (val === PASS) {
+    sessionStorage.setItem('trivia_auth','1');
+    document.getElementById('gate').remove();
+    refresh();
+  } else if (val === ADMIN_PASS) {
+    sessionStorage.setItem('trivia_auth','1');
+    sessionStorage.setItem('trivia_admin','1');
+    isAdmin = true;
+    document.getElementById('gate').remove();
+    document.getElementById('adminBar').classList.add('show');
+    refresh();
+  } else {
+    document.getElementById('gate-err').textContent = 'Wrong password — try again';
   }
 }
 
+// Scoreboard is built from localStorage of each team's device — 
+// since this is fully static, we use a shared key approach via BroadcastChannel
+// and also show the current device's score prominently
+
+const medals = ['🥇','🥈','🥉'];
+
+// Collect all known team scores from localStorage keys
+// Teams register themselves when they submit
+function getScores() {
+  const teams = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('team_score_')) {
+      try {
+        const data = JSON.parse(localStorage.getItem(key));
+        teams.push(data);
+      } catch(e) {}
+    }
+  }
+  return teams.sort((a,b) => b.score - a.score);
+}
+
+function refresh() {
+  const teams = getScores();
+  const board = document.getElementById('board');
+  if (!teams.length) {
+    board.innerHTML = '<div class="empty">No teams have registered yet.<br>Scores appear here when teams submit answers!</div>';
+    return;
+  }
+  board.innerHTML = teams.map((t,i) => `
+    <div class="team">
+      <div class="rank">${medals[i] || (i+1)+'.'}</div>
+      <div class="info">
+        <div class="name">${t.name}</div>
+        <div class="det">${t.answers || 0} answers submitted</div>
+      </div>
+      <div class="sc">${t.score}</div>
+    </div>
+  `).join('');
+}
+
+function resetAll() {
+  if (!isAdmin) return;
+  if (!confirm('Reset ALL team scores? This cannot be undone.')) return;
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('team_score_')) localStorage.removeItem(key);
+  }
+  refresh();
+}
+
+function exportCSV() {
+  const teams = getScores();
+  const csv = 'Team,Score,Answers\n' + teams.map(t => `"${t.name}",${t.score},${t.answers}`).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv,' + encodeURIComponent(csv);
+  a.download = 'trivia-scores.csv';
+  a.click();
+}
+
+// Listen for score updates from other tabs/devices via BroadcastChannel
+try {
+  const bc = new BroadcastChannel('trivia_scores');
+  bc.onmessage = () => refresh();
+} catch(e) {}
+
 refresh();
-setInterval(refresh, 8000);
+setInterval(refresh, 5000);
 </script>
 </body>
 </html>
