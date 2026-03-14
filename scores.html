@@ -38,11 +38,12 @@
 
 <script>
 const API = 'https://murphy-rog-zephyrus-g14-ga401qm-ga401qm.tail9c7ab.ts.net';
+const HEADERS = { 'x-api-key': 'hilary21' };
 const medals = ['🥇','🥈','🥉'];
 
 async function refresh() {
   try {
-    const res = await fetch(`${API}/api/scores`, { signal: AbortSignal.timeout(5000) });
+    const res = await fetch(`${API}/api/scores`, { headers: HEADERS, signal: AbortSignal.timeout(5000) });
     const teams = await res.json();
     const board = document.getElementById('board');
     if (!teams.length) {

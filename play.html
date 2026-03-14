@@ -81,6 +81,7 @@
 
 <script>
 const API = 'https://murphy-rog-zephyrus-g14-ga401qm-ga401qm.tail9c7ab.ts.net';
+const HEADERS = { 'Content-Type': 'application/json', 'x-api-key': 'hilary21' };
 let currentData = {};
 
 // Persist team name
@@ -94,7 +95,7 @@ window.addEventListener('load', () => {
 
 async function loadQuestion() {
   try {
-    const res = await fetch(`${API}/api/current`, { signal: AbortSignal.timeout(5000) });
+    const res = await fetch(`${API}/api/current`, { headers: HEADERS, signal: AbortSignal.timeout(5000) });
     const data = await res.json();
     currentData = data;
     document.getElementById('offlineNote').style.display = 'none';
@@ -120,7 +121,7 @@ async function submitAnswer() {
   try {
     const res = await fetch(`${API}/api/answer`, {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers: HEADERS,
       body: JSON.stringify({ team, answer })
     });
     const data = await res.json();
