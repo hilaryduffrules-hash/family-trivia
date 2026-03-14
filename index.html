@@ -99,6 +99,7 @@ textarea{resize:vertical;min-height:72px}
   <div class="tab active" onclick="showTab('play')">🎮 Play</div>
   <div class="tab" onclick="showTab('scores')">📊 Scores</div>
   <div class="tab" id="adminTab" onclick="showTab('admin')" style="display:none">🔧 Admin</div>
+  <div class="tab" id="adminUnlock" onclick="promptAdmin()" style="color:#555577;font-size:.8rem">🔑</div>
 </div>
 
 <!-- ══ PLAY TAB ══════════════════════════════════════════════════════════ -->
@@ -208,7 +209,7 @@ document.getElementById('gate-input').addEventListener('keydown', e => { if(e.ke
   const auth = sessionStorage.getItem('ta');
   if (auth) {
     document.getElementById('gate').style.display = 'none';
-    if (auth === 'admin') { isAdmin = true; document.getElementById('adminTab').style.display = ''; }
+    if (auth === 'admin') { isAdmin = true; document.getElementById('adminTab').style.display = ''; document.getElementById('adminUnlock').style.display = 'none'; }
     const saved = localStorage.getItem('trivia_team');
     if (saved) { document.getElementById('teamName').value = saved; registerTeam(true); }
     startPolling();
@@ -233,6 +234,21 @@ function checkGate() {
     startPolling();
   } else {
     document.getElementById('gate-err').textContent = 'Wrong password — try again';
+  }
+}
+
+function promptAdmin() {
+  if (isAdmin) { showTab('admin'); return; }
+  const pw = prompt('Admin password:');
+  if (pw === 'hilary21') {
+    isAdmin = true;
+    sessionStorage.setItem('ta','admin');
+    document.getElementById('adminTab').style.display = '';
+    document.getElementById('adminUnlock').style.display = 'none';
+    showTab('admin');
+    startPolling();
+  } else if (pw !== null) {
+    alert('Wrong password');
   }
 }
 
@@ -290,7 +306,7 @@ async function loadQuestion() {
     document.getElementById('alreadyMsg').style.display  = done ? 'block' : 'none';
     document.getElementById('submitBtn').style.display   = done ? 'none'  : 'block';
     document.getElementById('answerText').style.display  = done ? 'none'  : 'block';
-    if(!done) document.getElementById('playFb').style.display = 'none';
+    document.getElementById('playFb').style.display = 'none';
   } catch(e) { document.getElementById('playErr').style.display='block'; }
 }
 
@@ -302,7 +318,11 @@ async function submitAnswer() {
   btn.disabled=true; btn.textContent='Scoring…';
   try {
     const data = await api('/api/answer','POST',{ team:teamName, answer });
-    if (data.alreadyAnswered) { answeredKeys[currentKey]=true; loadQuestion(); btn.disabled=false; btn.textContent='Submit Answer ✓'; return; }
+    if (data.alreadyAnswered) {
+      answeredKeys[currentKey]=true;
+      document.getElementById('playFb').style.display='none';
+      loadQuestion(); btn.disabled=false; btn.textContent='Submit Answer ✓'; return;
+    }
     totalScore = data.totalScore;
     answeredKeys[currentKey] = true;
     document.getElementById('scoreDisplay').textContent = totalScore;
