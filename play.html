@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🎉 Trivia Night — Submit Answer</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#0F0F2A; color:#fff; font-family:'Segoe UI',Arial,sans-serif;
+    min-height:100vh; display:flex; flex-direction:column; align-items:center;
+    padding:20px 16px;
+  }
+  h1 { font-size:1.6rem; margin-bottom:4px; color:#FFD600; text-align:center; }
+  .subtitle { color:#AAAACC; font-size:0.9rem; margin-bottom:24px; text-align:center; }
+  .card {
+    background:#1A1A40; border-radius:16px; padding:20px;
+    width:100%; max-width:480px; margin-bottom:16px;
+  }
+  label { display:block; color:#AAAACC; font-size:0.8rem; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.08em; }
+  input, textarea {
+    width:100%; background:#0F0F2A; border:2px solid #333355;
+    border-radius:10px; color:#fff; font-size:1rem; padding:12px 14px;
+    outline:none; transition:border-color 0.2s;
+  }
+  input:focus, textarea:focus { border-color:#FFD600; }
+  textarea { resize:vertical; min-height:80px; }
+  button.submit {
+    width:100%; padding:14px; border-radius:10px; border:none;
+    background:#FFD600; color:#0F0F2A; font-size:1.1rem; font-weight:800;
+    cursor:pointer; transition:opacity 0.2s; margin-top:10px;
+  }
+  button.submit:hover { opacity:0.9; }
+  button.submit:disabled { opacity:0.5; cursor:not-allowed; }
+  .current-q {
+    background:#0F0F2A; border:2px solid #29B6F6; border-radius:12px;
+    padding:14px; margin-bottom:16px; width:100%; max-width:480px;
+  }
+  .q-label { color:#29B6F6; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:6px; }
+  .q-text { font-size:1.05rem; line-height:1.45; font-weight:600; white-space:pre-line; }
+  .feedback {
+    display:none; padding:16px; border-radius:12px; margin-top:12px;
+    font-weight:700; font-size:1.05rem; text-align:center;
+  }
+  .feedback.correct { background:#1B4332; border:2px solid #66BB6A; color:#66BB6A; }
+  .feedback.partial  { background:#3B2800; border:2px solid #FFD600;  color:#FFD600; }
+  .feedback.wrong    { background:#3B1A1A; border:2px solid #FF7043;  color:#FF7043; }
+  .score-badge {
+    background:#29B6F6; color:#0F0F2A; border-radius:50px;
+    padding:4px 14px; font-weight:800; font-size:1.1rem; display:inline-block; margin-top:6px;
+  }
+  a.link { color:#AAAACC; text-align:center; display:block; margin-top:8px; font-size:0.9rem; text-decoration:none; }
+  a.link:hover { color:#FFD600; }
+  .offline-note { color:#FF7043; font-size:0.8rem; text-align:center; display:none; margin-top:8px; }
+</style>
+</head>
+<body>
+<h1>🎉 Family Trivia Night</h1>
+<p class="subtitle">Submit your team's answers below</p>
+
+<div class="card">
+  <label>Your Team Name</label>
+  <input type="text" id="teamName" placeholder="e.g. Team Murphy" maxlength="30"
+    onchange="saveTeam()" oninput="saveTeam()">
+</div>
+
+<div class="current-q" id="currentQ">
+  <div class="q-label">Current Question</div>
+  <div class="q-text" id="qText">Connecting to game server…</div>
+</div>
+
+<div class="card">
+  <label>Your Answer</label>
+  <textarea id="answerText" placeholder="Type your answer here…" rows="3"></textarea>
+  <button class="submit" id="submitBtn" onclick="submitAnswer()">Submit Answer ✓</button>
+  <div class="feedback" id="feedback"></div>
+</div>
+
+<a class="link" href="scores.html">📊 View Scoreboard →</a>
+<p class="offline-note" id="offlineNote">⚠️ Can't reach game server — check your connection</p>
+
+<script>
+const API = 'https://murphy-rog-zephyrus-g14-ga401qm-ga401qm.tail9c7ab.ts.net';
+let currentData = {};
+
+// Persist team name
+function saveTeam() {
+  localStorage.setItem('triviaTeam', document.getElementById('teamName').value);
+}
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('triviaTeam');
+  if (saved) document.getElementById('teamName').value = saved;
+});
+
+async function loadQuestion() {
+  try {
+    const res = await fetch(`${API}/api/current`, { signal: AbortSignal.timeout(5000) });
+    const data = await res.json();
+    currentData = data;
+    document.getElementById('offlineNote').style.display = 'none';
+    document.getElementById('qText').textContent = data.question
+      ? `Round ${data.round}, Q${data.questionNum}/${data.totalQuestions}:\n\n${data.question}`
+      : 'Waiting for next question…';
+  } catch(e) {
+    document.getElementById('offlineNote').style.display = 'block';
+    document.getElementById('qText').textContent = 'Could not reach server — retrying…';
+  }
+}
+
+async function submitAnswer() {
+  const team   = document.getElementById('teamName').value.trim();
+  const answer = document.getElementById('answerText').value.trim();
+  if (!team)   { alert('Enter your team name first!'); return; }
+  if (!answer) { alert('Enter an answer!'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Scoring with AI…';
+
+  try {
+    const res = await fetch(`${API}/api/answer`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ team, answer })
+    });
+    const data = await res.json();
+    const fb = document.getElementById('feedback');
+    fb.style.display = 'block';
+
+    if (data.points >= 8) {
+      fb.className = 'feedback correct';
+      fb.innerHTML = `✅ Nice one! <span class="score-badge">+${data.points} pts</span><br><small>${data.feedback}</small>`;
+    } else if (data.points >= 4) {
+      fb.className = 'feedback partial';
+      fb.innerHTML = `🤔 Partial credit! <span class="score-badge">+${data.points} pts</span><br><small>${data.feedback}</small>`;
+    } else {
+      fb.className = 'feedback wrong';
+      fb.innerHTML = `❌ Not quite. <span class="score-badge">+${data.points} pts</span><br><small>${data.feedback}</small>`;
+    }
+
+    document.getElementById('answerText').value = '';
+    setTimeout(() => { fb.style.display = 'none'; }, 6000);
+  } catch(e) {
+    alert('Submission failed — check your connection and try again');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Submit Answer ✓';
+}
+
+loadQuestion();
+setInterval(loadQuestion, 5000);
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📊 Trivia Scoreboard</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0F0F2A; color:#fff; font-family:'Segoe UI',Arial,sans-serif; padding:24px 16px; }
+  h1 { color:#FFD600; font-size:2rem; text-align:center; margin-bottom:6px; }
+  .subtitle { color:#AAAACC; text-align:center; margin-bottom:28px; font-size:0.9rem; }
+  .board { max-width:640px; margin:0 auto; }
+  .team {
+    background:#1A1A40; border-radius:14px; padding:18px 22px;
+    margin-bottom:14px; display:flex; align-items:center; gap:18px;
+    transition:transform 0.2s;
+  }
+  .team:nth-child(1) { border:2px solid #FFD600; }
+  .team:nth-child(2) { border:2px solid #AAAACC; }
+  .team:nth-child(3) { border:2px solid #FF7043; }
+  .rank { font-size:2rem; width:44px; text-align:center; }
+  .team-info { flex:1; }
+  .team-name { font-size:1.15rem; font-weight:800; }
+  .team-answers { color:#AAAACC; font-size:0.8rem; margin-top:3px; }
+  .team-score { font-size:2.2rem; font-weight:900; color:#FFD600; }
+  .empty { text-align:center; color:#AAAACC; padding:60px 20px; font-size:1.1rem; }
+  .pulse { animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+  a.link { color:#AAAACC; text-align:center; display:block; margin-top:20px; font-size:0.9rem; text-decoration:none; }
+  a.link:hover { color:#FFD600; }
+</style>
+</head>
+<body>
+<h1>📊 Scoreboard</h1>
+<p class="subtitle">Live · refreshes every 8 seconds</p>
+<div class="board" id="board"><div class="empty pulse">Waiting for teams to join…</div></div>
+<a class="link" href="play.html">← Back to Submit Answers</a>
+
+<script>
+const API = 'https://murphy-rog-zephyrus-g14-ga401qm-ga401qm.tail9c7ab.ts.net';
+const medals = ['🥇','🥈','🥉'];
+
+async function refresh() {
+  try {
+    const res = await fetch(`${API}/api/scores`, { signal: AbortSignal.timeout(5000) });
+    const teams = await res.json();
+    const board = document.getElementById('board');
+    if (!teams.length) {
+      board.innerHTML = '<div class="empty pulse">No teams yet — waiting for submissions!</div>';
+      return;
+    }
+    board.innerHTML = teams.map((t, i) => `
+      <div class="team">
+        <div class="rank">${medals[i] || (i+1) + '.'}</div>
+        <div class="team-info">
+          <div class="team-name">${t.name}</div>
+          <div class="team-answers">${t.answers} answer${t.answers !== 1 ? 's' : ''} submitted</div>
+        </div>
+        <div class="team-score">${t.score}</div>
+      </div>
+    `).join('');
+  } catch(e) {
+    // Keep showing last known state on error
+  }
+}
+
+refresh();
+setInterval(refresh, 8000);
+</script>
+</body>
+</html>
