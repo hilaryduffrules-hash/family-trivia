@@ -2,52 +2,51 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>🎉 Family Trivia Night — Submit</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>🎉 Trivia Night — Submit</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#0F0F2A;color:#fff;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 16px}
-  h1{font-size:1.6rem;margin-bottom:4px;color:#FFD600;text-align:center}
-  .sub{color:#AAAACC;font-size:.9rem;margin-bottom:20px;text-align:center}
-  .card{background:#1A1A40;border-radius:16px;padding:18px;width:100%;max-width:480px;margin-bottom:14px}
-  label{display:block;color:#AAAACC;font-size:.75rem;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
-  input,textarea,select{width:100%;background:#0F0F2A;border:2px solid #333355;border-radius:10px;color:#fff;font-size:1rem;padding:11px 14px;outline:none;transition:border-color .2s}
-  input:focus,textarea:focus,select:focus{border-color:#FFD600}
-  select option{background:#1A1A40}
-  textarea{resize:vertical;min-height:80px}
-  .row{display:flex;gap:10px}
-  .row>*{flex:1}
-  .btn{width:100%;padding:14px;border-radius:10px;border:none;background:#FFD600;color:#0F0F2A;font-size:1.1rem;font-weight:800;cursor:pointer;transition:opacity .2s;margin-top:10px}
-  .btn:hover{opacity:.9}
-  .btn:disabled{opacity:.4;cursor:not-allowed}
-  .q-box{background:#0F0F2A;border:2px solid #29B6F6;border-radius:12px;padding:14px;margin-bottom:14px;width:100%;max-width:480px}
-  .q-label{color:#29B6F6;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
-  .q-text{font-size:1rem;line-height:1.5;font-weight:600;white-space:pre-line}
-  .feedback{display:none;padding:14px;border-radius:12px;margin-top:12px;font-weight:700;font-size:1rem;text-align:center}
-  .correct{background:#1B4332;border:2px solid #66BB6A;color:#66BB6A}
-  .partial{background:#3B2800;border:2px solid #FFD600;color:#FFD600}
-  .wrong{background:#3B1A1A;border:2px solid #FF7043;color:#FF7043}
-  .badge{background:#29B6F6;color:#0F0F2A;border-radius:50px;padding:3px 12px;font-weight:800;font-size:1rem;display:inline-block;margin-top:4px}
-  .score-strip{background:#1A1A40;border-radius:12px;padding:12px 18px;width:100%;max-width:480px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
-  .score-strip .lbl{color:#AAAACC;font-size:.8rem}
-  .score-strip .val{color:#FFD600;font-size:1.6rem;font-weight:900}
-  a.lnk{color:#AAAACC;text-align:center;display:block;margin-top:8px;font-size:.9rem;text-decoration:none}
-  a.lnk:hover{color:#FFD600}
-  /* Gate */
-  #gate{position:fixed;inset:0;background:#0F0F2A;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:20px}
-  #gate h2{color:#FFD600;font-size:1.8rem;margin-bottom:8px}
-  #gate p{color:#AAAACC;margin-bottom:28px;text-align:center}
-  #gate input{max-width:320px;margin-bottom:12px}
-  #gate button{max-width:320px;width:100%;padding:12px;border-radius:10px;border:none;background:#FFD600;color:#0F0F2A;font-size:1rem;font-weight:800;cursor:pointer}
-  #gate-err{color:#FF7043;min-height:1.4em;font-size:.9rem;text-align:center}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0F0F2A;color:#fff;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 16px}
+h1{font-size:1.5rem;color:#FFD600;text-align:center;margin-bottom:4px}
+.sub{color:#AAAACC;font-size:.85rem;margin-bottom:18px;text-align:center}
+.card{background:#1A1A40;border-radius:14px;padding:16px;width:100%;max-width:460px;margin-bottom:12px}
+label{display:block;color:#AAAACC;font-size:.72rem;margin-bottom:5px;text-transform:uppercase;letter-spacing:.08em}
+input,textarea{width:100%;background:#0F0F2A;border:2px solid #333355;border-radius:9px;color:#fff;font-size:1rem;padding:10px 13px;outline:none;transition:border-color .2s}
+input:focus,textarea:focus{border-color:#FFD600}
+textarea{resize:vertical;min-height:75px}
+.btn{width:100%;padding:13px;border-radius:9px;border:none;background:#FFD600;color:#0F0F2A;font-size:1.05rem;font-weight:800;cursor:pointer;margin-top:10px;transition:opacity .2s}
+.btn:hover{opacity:.9}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.q-box{background:#0F0F2A;border:2px solid #29B6F6;border-radius:12px;padding:14px;margin-bottom:12px;width:100%;max-width:460px}
+.q-label{color:#29B6F6;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.q-meta{color:#AAAACC;font-size:.78rem;margin-bottom:6px}
+.q-text{font-size:1.05rem;line-height:1.5;font-weight:600;white-space:pre-line}
+.feedback{display:none;padding:13px;border-radius:10px;margin-top:10px;font-weight:700;font-size:.95rem;text-align:center}
+.correct{background:#1B4332;border:2px solid #66BB6A;color:#66BB6A}
+.partial{background:#3B2800;border:2px solid #FFD600;color:#FFD600}
+.wrong{background:#3B1A1A;border:2px solid #FF7043;color:#FF7043}
+.badge{background:#29B6F6;color:#0F0F2A;border-radius:50px;padding:2px 12px;font-weight:800;font-size:.95rem;display:inline-block;margin-left:6px}
+.score-strip{background:#1A1A40;border-radius:12px;padding:12px 16px;width:100%;max-width:460px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.score-strip .lbl{color:#AAAACC;font-size:.75rem}
+.score-strip .val{color:#FFD600;font-size:1.5rem;font-weight:900}
+a.lnk{color:#AAAACC;text-align:center;display:block;margin-top:8px;font-size:.88rem;text-decoration:none}
+a.lnk:hover{color:#FFD600}
+.already{color:#66BB6A;font-size:.82rem;margin-top:6px;display:none}
+/* Gate */
+#gate{position:fixed;inset:0;background:#0F0F2A;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:20px}
+#gate h2{color:#FFD600;font-size:1.8rem;margin-bottom:8px}
+#gate p{color:#AAAACC;margin-bottom:24px;text-align:center}
+#gate input{width:100%;max-width:300px;background:#1A1A40;border:2px solid #333355;border-radius:9px;color:#fff;font-size:1rem;padding:11px 14px;outline:none;margin-bottom:12px}
+#gate input:focus{border-color:#FFD600}
+#gate button{width:100%;max-width:300px;padding:12px;border-radius:9px;border:none;background:#FFD600;color:#0F0F2A;font-size:1rem;font-weight:800;cursor:pointer}
+#gate-err{color:#FF7043;min-height:1.4em;font-size:.88rem;text-align:center;margin-top:8px}
 </style>
 </head>
 <body>
 
-<!-- Password gate -->
 <div id="gate">
   <h2>🎉 Trivia Night</h2>
-  <p>Enter the password to join the game</p>
+  <p>Enter tonight's password to join</p>
   <input type="password" id="gate-input" placeholder="Password" autocomplete="off">
   <button onclick="checkGate()">Enter →</button>
   <div id="gate-err"></div>
@@ -57,257 +56,163 @@
 <p class="sub">Submit your team's answers</p>
 
 <div class="score-strip">
-  <div><div class="lbl">Team</div><div style="font-weight:700;font-size:1rem" id="teamDisplay">—</div></div>
+  <div><div class="lbl">Team</div><div style="font-weight:700;font-size:.95rem" id="teamDisplay">—</div></div>
   <div style="text-align:right"><div class="lbl">Score</div><div class="val" id="scoreDisplay">0</div></div>
 </div>
 
 <div class="card">
   <label>Your Team Name</label>
-  <input type="text" id="teamName" placeholder="e.g. Team Murphy" maxlength="30" oninput="saveTeam()">
+  <input type="text" id="teamName" placeholder="e.g. The Murphys" maxlength="30">
+  <button class="btn" id="joinBtn" onclick="registerTeam()" style="margin-top:10px">Join Game →</button>
 </div>
 
-<div class="q-box" id="qBox">
-  <div class="q-label">Question</div>
-  <div class="q-text" id="qText">Select a round and question below ↓</div>
-</div>
+<div id="gameSection" style="display:none;width:100%;max-width:460px;display:none;flex-direction:column;align-items:center">
 
-<div class="card">
-  <label>Round & Question</label>
-  <div class="row">
-    <div>
-      <select id="roundSel" onchange="updateQ()">
-        <option value="1">Round 1 — General</option>
-        <option value="2">Round 2 — Cartoons</option>
-        <option value="3">Round 3 — Name That Tune</option>
-      </select>
-    </div>
-    <div>
-      <select id="qSel" onchange="updateQ()"></select>
-    </div>
+  <div class="q-box" id="qBox">
+    <div class="q-label">Current Question</div>
+    <div class="q-meta" id="qMeta">Loading…</div>
+    <div class="q-text" id="qText">Connecting…</div>
   </div>
-</div>
 
-<div class="card">
-  <label>Your Answer</label>
-  <textarea id="answerText" placeholder="Type your answer here…" rows="3"></textarea>
-  <button class="btn" id="submitBtn" onclick="submitAnswer()">Submit Answer ✓</button>
-  <div class="feedback" id="feedback"></div>
-</div>
+  <div class="card">
+    <label>Your Answer</label>
+    <textarea id="answerText" placeholder="Type your answer…" rows="3"></textarea>
+    <div class="already" id="alreadyMsg">✅ Already answered this one!</div>
+    <button class="btn" id="submitBtn" onclick="submitAnswer()">Submit Answer ✓</button>
+    <div class="feedback" id="feedback"></div>
+  </div>
 
-<a class="lnk" href="scores.html">📊 View Scoreboard →</a>
+  <a class="lnk" href="scores.html">📊 View Scoreboard →</a>
+</div>
 
 <script>
-const PASS = 'carlysbirthday';
-const OR_KEY = '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';
+const API  = 'https://murphy-rog-zephyrus-g14-ga401qm-ga401qm.tail9c7ab.ts.net';
+const PKEY = 'carlysbirthday';
+let teamName = '';
+let totalScore = 0;
+let answeredKeys = {};
+let currentKey = '';
 
-// ── Password gate ──────────────────────────────────────────────────────────
-if (sessionStorage.getItem('trivia_auth') === '1') document.getElementById('gate').remove();
+// ── Gate ──────────────────────────────────────────────────────────────────
 document.getElementById('gate-input').addEventListener('keydown', e => { if(e.key==='Enter') checkGate(); });
+if (sessionStorage.getItem('ta') === '1') document.getElementById('gate').remove();
+
 function checkGate() {
-  if (document.getElementById('gate-input').value.trim().toLowerCase() === PASS) {
-    sessionStorage.setItem('trivia_auth','1');
+  const v = document.getElementById('gate-input').value.trim().toLowerCase();
+  if (v === 'carlysbirthday') {
+    sessionStorage.setItem('ta','1');
     document.getElementById('gate').remove();
+    tryAutoLogin();
   } else {
     document.getElementById('gate-err').textContent = 'Wrong password — try again';
   }
 }
 
-// ── Question data ──────────────────────────────────────────────────────────
-const rounds = [
-  { num:1, questions:[
-    "What year did the Berlin Wall fall?",
-    "Which chemical element has the symbol Au?",
-    "How many bones are in the adult human body?",
-    "What is the only country in the world that borders both France and Spain?",
-    "What is the powerhouse of the cell?",
-    "What year did the first iPhone launch?",
-    "Which Shakespeare play features the line 'Et tu, Brute'?",
-    "What is the largest desert in the world by total area?",
-    "What is the longest bone in the human body?",
-    "Which country gifted the Statue of Liberty to the United States?",
-    "How many sides does a dodecagon have?",
-    "Which planet has the most confirmed moons in our solar system?",
-    "What year did Google officially launch?",
-    "What is the most consumed beverage in the world after water?",
-    "In Morse code, what does ··· — ··· represent?"
-  ]},
-  { num:2, questions:[
-    "In Avatar: The Last Airbender, what is the name of Aang's flying sky bison?",
-    "What year did the original Toy Story release in theatres?",
-    "Who voiced Genie in the original 1992 Aladdin?",
-    "In The Incredibles, what is Syndrome's real birth name?",
-    "In Ratatouille, what is the name of the legendary chef Remy idolizes?",
-    "What is the full name of the bully kid in the original Toy Story?",
-    "In Kim Possible, what is the name of her naked mole rat sidekick?",
-    "What does WALL-E stand for?",
-    "In The Lion King, what type of animal is Timon?",
-    "Name all 5 original emotions in Pixar's Inside Out.",
-    "In Rugrats, what is the name of Angelica's favourite doll?",
-    "In SpongeBob SquarePants, who is the owner of the Krusty Krab?",
-    "In Encanto, what is the name of the Madrigal family's magical home?",
-    "What is the name of Bluey's dad?",
-    "In Phineas and Ferb, what does Dr. Doofenshmirtz's jingle always end with?"
-  ]},
-  { num:3, questions:[
-    'Clip 1: "The men up there don\'t like a lot of blabber…" — Name the song & movie!',
-    'Clip 2: "For years I\'ve roamed these empty halls…" — Name the song & movie!',
-    'Clip 3: "If there\'s a prize for rotten judgement…" — Name the song & movie!',
-    'Clip 4: "There\'s a calm surrender to the rush of day…" — Name the song & movie!',
-    'Clip 5: "You think you own whatever land you land on…" — Name the song & movie!',
-    'Clip 6: "I have often dreamed of a far-off place…" — Name the song & movie!',
-    'Clip 7: "Well Ali Baba had them forty thieves…" — Name the song & movie!',
-    'Clip 8: "I\'ve been staring at the edge of the water…" — Name the song & movie!',
-    'Clip 9: "Well Tamatoa hasn\'t always been this glam…" — Name the song & movie!',
-    'Clip 10: "When somebody loved me, everything was beautiful…" — Name the song & movie!',
-    'Clip 11: "Boys and girls of every age, wouldn\'t you like to see something strange?" — Name the song & movie!',
-    'Clip 12: "I\'m the strong one, I\'m not nervous…" — Name the song & movie!',
-    'Clip 13: "I messed up tonight, I lost another fight… I\'ll try everything!" — Name the song & movie!',
-    'Clip 14: "You are my greatest gift, I wrapped you in clover…" — Name the song & movie!',
-    'Clip 15: "When the wind is in my hair, and the fire\'s in the air…" — Name the song & movie!'
-  ]}
-];
+function tryAutoLogin() {
+  const saved = localStorage.getItem('trivia_team');
+  if (saved) {
+    document.getElementById('teamName').value = saved;
+    registerTeam(true);
+  }
+}
+if (sessionStorage.getItem('ta') === '1') tryAutoLogin();
 
-const answers = [
-  ["1989","Gold","206","Andorra","The mitochondria","2007","Julius Caesar","Antarctica","The femur","France","12","Saturn","1998","Tea","SOS"],
-  ["Appa","1995","Robin Williams","Buddy Pine","Auguste Gusteau","Sid Phillips","Rufus","Waste Allocation Load Lifter Earth-Class","A meerkat","Joy Sadness Anger Fear Disgust","Cynthia","Mr Krabs","Casita","Bandit","Doofenshmirtz Evil Incorporated"],
-  ["Poor Unfortunate Souls The Little Mermaid","For the First Time in Forever Frozen","I Won't Say I'm in Love Hercules","Can You Feel the Love Tonight The Lion King","Colors of the Wind Pocahontas","Go the Distance Hercules","Friend Like Me Aladdin","How Far I'll Go Moana","Shiny Moana","When She Loved Me Toy Story 2","This Is Halloween Nightmare Before Christmas","Surface Pressure Encanto","Try Everything Zootopia","Mother Knows Best Tangled","Touch the Sky Brave"]
-];
-
-// ── State ──────────────────────────────────────────────────────────────────
-let score = parseInt(localStorage.getItem('trivia_score') || '0');
-let answered = JSON.parse(localStorage.getItem('trivia_answered') || '{}');
-
-function saveTeam() {
+// ── Register team ─────────────────────────────────────────────────────────
+async function registerTeam(silent=false) {
   const name = document.getElementById('teamName').value.trim();
-  localStorage.setItem('trivia_team', name);
-  document.getElementById('teamDisplay').textContent = name || '—';
-  if (name) {
-    const teamKey = 'team_score_' + name.toLowerCase().replace(/[^a-z0-9]/g,'_');
-    if (!localStorage.getItem(teamKey)) {
-      localStorage.setItem(teamKey, JSON.stringify({ name, score: 0, answers: 0 }));
-      try { new BroadcastChannel('trivia_scores').postMessage('update'); } catch(e) {}
-    }
-  }
-}
+  if (!name) { alert('Enter your team name!'); return; }
 
-function updateScoreDisplay() {
-  document.getElementById('scoreDisplay').textContent = score;
-}
+  const btn = document.getElementById('joinBtn');
+  btn.disabled = true;
+  btn.textContent = 'Joining…';
 
-// ── Build question dropdowns ───────────────────────────────────────────────
-function buildQSel() {
-  const r = parseInt(document.getElementById('roundSel').value) - 1;
-  const sel = document.getElementById('qSel');
-  sel.innerHTML = rounds[r].questions.map((_, i) =>
-    `<option value="${i}">Q${i+1}</option>`).join('');
-  updateQ();
-}
-
-function updateQ() {
-  const r = parseInt(document.getElementById('roundSel').value) - 1;
-  const q = parseInt(document.getElementById('qSel').value);
-  const key = `${r}-${q}`;
-  document.getElementById('qText').textContent = rounds[r].questions[q];
-  const fb = document.getElementById('feedback');
-  if (answered[key]) {
-    fb.style.display = 'block';
-    const pts = answered[key].points;
-    fb.className = 'feedback ' + (pts>=8?'correct':pts>=4?'partial':'wrong');
-    fb.innerHTML = `Already answered — <span class="badge">${pts} pts</span> · ${answered[key].feedback}`;
-  } else {
-    fb.style.display = 'none';
-  }
-}
-
-// ── Score with Kimi 2.5 via OpenRouter ────────────────────────────────────
-async function scoreWithKimi(question, correctAnswer, playerAnswer) {
   try {
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method:'POST',
-      headers:{
-        'Authorization': `Bearer ${OR_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://hilaryduffrules-hash.github.io/family-trivia/',
-        'X-Title': 'Family Trivia Night'
-      },
-      body: JSON.stringify({
-        model: 'moonshotai/kimi-k2',
-        max_tokens: 80,
-        messages:[{
-          role:'system',
-          content:'You are a lenient family trivia judge. Minor spelling errors and informal phrasings get credit. Respond ONLY with valid JSON: {"correct":true/false,"points":0-10,"feedback":"short comment"}. Points: 10=perfect, 7-9=mostly right, 4-6=partial, 0-3=wrong.'
-        },{
-          role:'user',
-          content:`Question: "${question}"\nCorrect answer: "${correctAnswer}"\nPlayer answered: "${playerAnswer}"\nScore it.`
-        }]
-      })
+    const res = await fetch(`${API}/api/register`, {
+      method:'POST', headers:{'Content-Type':'application/json','x-api-key':PKEY},
+      body: JSON.stringify({ team: name })
     });
     const data = await res.json();
-    const content = data.choices?.[0]?.message?.content || '{}';
-    const match = content.match(/\{[\s\S]*\}/);
-    return match ? JSON.parse(match[0]) : {correct:false,points:0,feedback:'Could not score'};
+    teamName = data.name;
+    totalScore = data.score;
+    answeredKeys = {};
+    (data.answeredQuestions||[]).forEach(k => answeredKeys[k] = true);
+
+    localStorage.setItem('trivia_team', teamName);
+    document.getElementById('teamDisplay').textContent = teamName;
+    document.getElementById('scoreDisplay').textContent = totalScore;
+    document.getElementById('gameSection').style.display = 'flex';
+
+    loadQuestion();
   } catch(e) {
-    // Fallback: fuzzy match
-    const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g,'');
-    const ca = norm(correctAnswer);
-    const pa = norm(playerAnswer);
-    const correct = ca.includes(pa.substring(0,5)) || pa.includes(ca.substring(0,5));
-    return {correct, points: correct?8:0, feedback: correct?'Looks right!':'Not quite'};
+    if (!silent) alert('Could not connect to game server — check your connection');
+    btn.disabled = false;
+    btn.textContent = 'Join Game →';
   }
 }
 
-// ── Submit answer ──────────────────────────────────────────────────────────
+// ── Load current question ─────────────────────────────────────────────────
+async function loadQuestion() {
+  try {
+    const res = await fetch(`${API}/api/current`, { headers:{'x-api-key':PKEY} });
+    const data = await res.json();
+    currentKey = `${data.round}-${data.questionNum-1}`;
+    document.getElementById('qMeta').textContent = `Round ${data.round} · Q${data.questionNum} of ${data.totalQuestions}`;
+    document.getElementById('qText').textContent = data.question || 'Waiting for next question…';
+
+    const already = answeredKeys[currentKey];
+    document.getElementById('alreadyMsg').style.display = already ? 'block' : 'none';
+    document.getElementById('submitBtn').style.display  = already ? 'none'  : 'block';
+    document.getElementById('answerText').style.display = already ? 'none'  : 'block';
+    document.getElementById('feedback').style.display = 'none';
+  } catch(e) {}
+}
+setInterval(loadQuestion, 4000);
+
+// ── Submit ─────────────────────────────────────────────────────────────────
 async function submitAnswer() {
-  const team = document.getElementById('teamName').value.trim();
   const answer = document.getElementById('answerText').value.trim();
-  if (!team) { alert('Enter your team name first!'); return; }
-  if (!answer) { alert('Enter an answer!'); return; }
-
-  const r = parseInt(document.getElementById('roundSel').value) - 1;
-  const q = parseInt(document.getElementById('qSel').value);
-  const key = `${r}-${q}`;
-
-  if (answered[key]) { alert("You've already answered this one!"); return; }
+  if (!answer) { alert('Type an answer first!'); return; }
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.textContent = 'Scoring with Kimi AI…';
+  btn.textContent = 'Scoring…';
 
-  const result = await scoreWithKimi(rounds[r].questions[q], answers[r][q], answer);
+  try {
+    const res = await fetch(`${API}/api/answer`, {
+      method:'POST', headers:{'Content-Type':'application/json','x-api-key':PKEY},
+      body: JSON.stringify({ team:teamName, answer })
+    });
+    const data = await res.json();
 
-  score += result.points;
-  answered[key] = { points: result.points, feedback: result.feedback };
-  localStorage.setItem('trivia_score', score);
-  localStorage.setItem('trivia_answered', JSON.stringify(answered));
-  updateScoreDisplay();
+    if (data.alreadyAnswered) {
+      answeredKeys[currentKey] = true;
+      loadQuestion();
+      btn.disabled = false;
+      btn.textContent = 'Submit Answer ✓';
+      return;
+    }
 
-  // Register this team's score to the shared scoreboard pool
-  const teamKey = 'team_score_' + team.toLowerCase().replace(/[^a-z0-9]/g,'_');
-  const existing = JSON.parse(localStorage.getItem(teamKey) || '{"name":"","score":0,"answers":0}');
-  localStorage.setItem(teamKey, JSON.stringify({
-    name: team,
-    score: score,
-    answers: Object.keys(answered).length
-  }));
-  try { new BroadcastChannel('trivia_scores').postMessage('update'); } catch(e) {}
+    totalScore = data.totalScore;
+    answeredKeys[currentKey] = true;
+    document.getElementById('scoreDisplay').textContent = totalScore;
 
-  const fb = document.getElementById('feedback');
-  fb.style.display = 'block';
-  fb.className = 'feedback ' + (result.points>=8?'correct':result.points>=4?'partial':'wrong');
-  fb.innerHTML = (result.points>=8?'✅ Nice one!':result.points>=4?'🤔 Partial credit!':'❌ Not quite.')
-    + ` <span class="badge">+${result.points} pts</span><br><small>${result.feedback}</small>`;
+    const fb = document.getElementById('feedback');
+    fb.style.display = 'block';
+    const pts = data.points;
+    fb.className = 'feedback ' + (pts>=8?'correct':pts>=4?'partial':'wrong');
+    fb.innerHTML = (pts>=8?'✅ Correct!':pts>=4?'🤔 Partial credit!':'❌ Not quite.')
+      + `<span class="badge">+${pts} pts</span><br><small>${data.feedback}</small>`;
 
-  document.getElementById('answerText').value = '';
+    document.getElementById('answerText').value = '';
+    document.getElementById('answerText').style.display = 'none';
+    document.getElementById('alreadyMsg').style.display = 'block';
+    btn.style.display = 'none';
+  } catch(e) {
+    alert('Submission failed — try again');
+  }
   btn.disabled = false;
   btn.textContent = 'Submit Answer ✓';
 }
-
-// ── Init ───────────────────────────────────────────────────────────────────
-const savedTeam = localStorage.getItem('trivia_team') || '';
-document.getElementById('teamName').value = savedTeam;
-document.getElementById('teamDisplay').textContent = savedTeam || '—';
-updateScoreDisplay();
-buildQSel();
 </script>
 </body>
 </html>

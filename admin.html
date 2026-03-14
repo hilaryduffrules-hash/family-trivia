@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🔧 Trivia Admin</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0F0F2A;color:#fff;font-family:'Segoe UI',Arial,sans-serif;padding:20px 16px}
+h1{color:#FFD600;font-size:1.6rem;margin-bottom:4px}
+.sub{color:#AAAACC;font-size:.85rem;margin-bottom:20px}
+.card{background:#1A1A40;border-radius:14px;padding:16px;margin-bottom:14px;max-width:700px}
+h3{color:#29B6F6;font-size:1rem;margin-bottom:12px;font-weight:700}
+.btn{padding:10px 18px;border-radius:8px;border:none;font-weight:700;cursor:pointer;font-size:.9rem;transition:opacity .2s}
+.btn:hover{opacity:.85}
+.btn-gold{background:#FFD600;color:#0F0F2A}
+.btn-blue{background:#29B6F6;color:#0F0F2A}
+.btn-red{background:#FF7043;color:#fff}
+.btn-green{background:#66BB6A;color:#0F0F2A}
+.btn-sm{padding:6px 12px;font-size:.8rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+select,input[type=number]{background:#0F0F2A;border:2px solid #333355;border-radius:8px;color:#fff;padding:8px 12px;font-size:.9rem;outline:none}
+select:focus,input[type=number]:focus{border-color:#FFD600}
+.q-display{background:#0F0F2A;border:2px solid #29B6F6;border-radius:10px;padding:12px;margin-bottom:14px}
+.q-display .lbl{color:#29B6F6;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.q-display .text{font-size:1rem;font-weight:700;line-height:1.4}
+.q-display .answer{color:#66BB6A;font-size:.85rem;margin-top:6px}
+.answer-row{background:#0F0F2A;border-radius:9px;padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}
+.ar-team{font-weight:800;font-size:.95rem;min-width:100px}
+.ar-answer{flex:1;font-size:.9rem;color:#DDDDE8}
+.ar-pts{color:#FFD600;font-weight:900;font-size:1.1rem;min-width:36px;text-align:center}
+.ar-fb{color:#AAAACC;font-size:.75rem;margin-top:2px}
+.ar-status{font-size:.72rem;padding:2px 8px;border-radius:50px;font-weight:700}
+.approved{background:#1B4332;color:#66BB6A}
+.pending{background:#3B2800;color:#FFD600}
+.override-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.override-row input{width:70px}
+.scoreboard{max-width:700px}
+.team-row{background:#0F0F2A;border-radius:9px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:14px}
+.tr-rank{font-size:1.4rem;width:34px;text-align:center}
+.tr-name{flex:1;font-weight:700}
+.tr-score{color:#FFD600;font-size:1.4rem;font-weight:900}
+/* Gate */
+#gate{position:fixed;inset:0;background:#0F0F2A;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:20px}
+#gate h2{color:#FFD600;font-size:1.8rem;margin-bottom:8px}
+#gate p{color:#AAAACC;margin-bottom:24px;text-align:center}
+#gate input{width:100%;max-width:300px;background:#1A1A40;border:2px solid #333355;border-radius:9px;color:#fff;font-size:1rem;padding:11px 14px;outline:none;margin-bottom:12px}
+#gate input:focus{border-color:#FFD600}
+#gate button{width:100%;max-width:300px;padding:12px;border-radius:9px;border:none;background:#FFD600;color:#0F0F2A;font-size:1rem;font-weight:800;cursor:pointer}
+#gate-err{color:#FF7043;min-height:1.4em;font-size:.88rem;text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <h2>🔧 Admin Panel</h2>
+  <p>Admin password required</p>
+  <input type="password" id="gate-input" placeholder="Admin password" autocomplete="off">
+  <button onclick="checkGate()">Enter →</button>
+  <div id="gate-err"></div>
+</div>
+
+<h1>🔧 Trivia Admin</h1>
+<p class="sub">Host controls — advance questions, review answers, adjust scores</p>
+
+<!-- Current question -->
+<div class="card">
+  <h3>📍 Current Question</h3>
+  <div class="q-display" id="qDisplay">
+    <div class="lbl">Question</div>
+    <div class="text" id="qText">Loading…</div>
+    <div class="answer" id="qAnswer"></div>
+  </div>
+  <div class="row">
+    <button class="btn btn-gold" onclick="nextQ()">▶ Next Question</button>
+    <span style="color:#AAAACC;font-size:.85rem" id="qMeta">—</span>
+  </div>
+  <div class="row" style="margin-top:12px">
+    <span style="color:#AAAACC;font-size:.82rem">Jump to:</span>
+    <select id="gotoRound">
+      <option value="1">Round 1</option>
+      <option value="2">Round 2</option>
+      <option value="3">Round 3</option>
+    </select>
+    <input type="number" id="gotoQ" min="1" max="15" value="1" style="width:60px">
+    <button class="btn btn-blue btn-sm" onclick="gotoQ()">Go</button>
+  </div>
+</div>
+
+<!-- Answers this question -->
+<div class="card">
+  <h3>📝 Answers This Question <span id="answerCount" style="color:#AAAACC;font-weight:400;font-size:.85rem"></span></h3>
+  <div id="answersList"><div style="color:#AAAACC;font-size:.9rem">No answers yet</div></div>
+</div>
+
+<!-- Scoreboard -->
+<div class="card">
+  <h3>📊 Live Scores</h3>
+  <div class="scoreboard" id="scoresList"></div>
+</div>
+
+<!-- Danger zone -->
+<div class="card" style="border:1px solid #FF7043">
+  <h3 style="color:#FF7043">⚠ Danger Zone</h3>
+  <button class="btn btn-red btn-sm" onclick="resetAll()">🗑 Reset All Scores & Teams</button>
+</div>
+
+<script>
+const API   = 'https://murphy-rog-zephyrus-g14-ga401qm-ga401qm.tail9c7ab.ts.net';
+const AKEY  = 'hilary21';
+let currentState = {};
+let currentAnswers = [];
+
+document.getElementById('gate-input').addEventListener('keydown', e => { if(e.key==='Enter') checkGate(); });
+if (sessionStorage.getItem('ta_admin') === '1') { document.getElementById('gate').remove(); start(); }
+
+function checkGate() {
+  if (document.getElementById('gate-input').value.trim() === 'hilary21') {
+    sessionStorage.setItem('ta_admin','1');
+    document.getElementById('gate').remove();
+    start();
+  } else {
+    document.getElementById('gate-err').textContent = 'Wrong admin password';
+  }
+}
+
+function start() { refresh(); setInterval(refresh, 5000); }
+
+async function api(path, method='GET', body=null) {
+  const opts = { method, headers:{'Content-Type':'application/json','x-api-key':AKEY} };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API+path, opts);
+  return res.json();
+}
+
+async function refresh() {
+  const [q, answers, scores] = await Promise.all([
+    api('/api/current'),
+    api('/api/admin/answers'),
+    api('/api/scores')
+  ]);
+
+  currentState = q;
+  currentAnswers = answers.answers || [];
+
+  document.getElementById('qMeta').textContent = `Round ${q.round} · Q${q.questionNum} of ${q.totalQuestions}`;
+  document.getElementById('qText').textContent = q.question || '—';
+
+  // Show correct answer
+  const rounds = [
+    ["1989","Gold","206","Andorra","The mitochondria","2007","Julius Caesar","Antarctica","The femur","France","12","Saturn","1998","Tea","SOS"],
+    ["Appa","1995","Robin Williams","Buddy Pine","Auguste Gusteau","Sid Phillips","Rufus","Waste Allocation Load Lifter Earth-Class","A meerkat","Joy, Sadness, Anger, Fear, Disgust","Cynthia","Mr. Krabs","Casita","Bandit","Doofenshmirtz Evil Incorporated!"],
+    ["Poor Unfortunate Souls – The Little Mermaid","For the First Time in Forever – Frozen","I Won't Say I'm in Love – Hercules","Can You Feel the Love Tonight – The Lion King","Colors of the Wind – Pocahontas","Go the Distance – Hercules","Friend Like Me – Aladdin","How Far I'll Go – Moana","Shiny – Moana","When She Loved Me – Toy Story 2","This Is Halloween – The Nightmare Before Christmas","Surface Pressure – Encanto","Try Everything – Zootopia","Mother Knows Best – Tangled","Touch the Sky – Brave"]
+  ];
+  const correctAns = rounds[q.round-1]?.[q.questionNum-1] || '';
+  document.getElementById('qAnswer').textContent = '✅ Answer: ' + correctAns;
+
+  // Answers list
+  document.getElementById('answerCount').textContent = `(${currentAnswers.length} submitted)`;
+  const al = document.getElementById('answersList');
+  if (!currentAnswers.length) {
+    al.innerHTML = '<div style="color:#AAAACC;font-size:.9rem">No answers yet for this question</div>';
+  } else {
+    al.innerHTML = currentAnswers.map(a => `
+      <div class="answer-row" id="ar_${a.team.replace(/\s/g,'_')}">
+        <div>
+          <div class="ar-team">${a.team}</div>
+          <div class="ar-fb">${a.feedback}</div>
+        </div>
+        <div class="ar-answer">"${a.answer}"</div>
+        <div>
+          <div class="ar-pts">${a.points}</div>
+          <div class="ar-status ${a.approved?'approved':'pending'}">${a.approved?'✓ OK':'AI'}</div>
+        </div>
+        <div>
+          <div class="override-row">
+            <input type="number" id="pts_${a.team.replace(/\s/g,'_')}" min="0" max="10" value="${a.points}" style="width:60px">
+            <button class="btn btn-green btn-sm" onclick="override('${a.team}')">Save</button>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  // Scores
+  const medals = ['🥇','🥈','🥉'];
+  document.getElementById('scoresList').innerHTML = scores.length
+    ? scores.map((t,i) => `
+        <div class="team-row">
+          <div class="tr-rank">${medals[i]||(i+1)+'.'}</div>
+          <div class="tr-name">${t.name} <span style="color:#AAAACC;font-size:.78rem">(${t.answers} answers)</span></div>
+          <div class="tr-score">${t.score}</div>
+        </div>`).join('')
+    : '<div style="color:#AAAACC;font-size:.9rem">No teams yet</div>';
+}
+
+async function nextQ() {
+  await api('/api/admin/next','POST');
+  refresh();
+}
+
+async function gotoQ() {
+  const r = parseInt(document.getElementById('gotoRound').value);
+  const q = parseInt(document.getElementById('gotoQ').value)-1;
+  await api('/api/admin/goto','POST',{ round:r, question:q });
+  refresh();
+}
+
+async function override(team) {
+  const key = team.replace(/\s/g,'_');
+  const pts = parseInt(document.getElementById(`pts_${key}`).value);
+  await api('/api/admin/override','POST',{ team, points:pts });
+  refresh();
+}
+
+async function resetAll() {
+  if (!confirm('Reset ALL scores and teams? Cannot be undone.')) return;
+  await api('/api/admin/reset','POST');
+  refresh();
+}
+</script>
+</body>
+</html>
