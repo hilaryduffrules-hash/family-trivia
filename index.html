@@ -121,6 +121,14 @@ textarea{resize:vertical;min-height:72px}
       <div class="ql">Current Question</div>
       <div class="qm" id="playQMeta">—</div>
       <div class="qt" id="playQText">Loading…</div>
+      <div id="clipPlayer" style="display:none;margin-top:14px">
+        <button onclick="toggleClip()" id="clipBtn" style="
+          background:#66BB6A;color:#0F0F2A;border:none;border-radius:50px;
+          padding:10px 24px;font-size:1rem;font-weight:800;cursor:pointer;
+          display:flex;align-items:center;gap:8px;transition:background .2s">
+          <span id="clipIcon">▶</span><span id="clipLabel">Play Clip</span>
+        </button>
+      </div>
     </div>
     <div class="card">
       <label>Your Answer</label>
@@ -193,6 +201,7 @@ const AKEY = 'hilary21';
 let teamName = '', totalScore = 0, answeredKeys = {}, currentKey = '';
 let isAdmin = false;
 let activeTab = 'play';
+let currentAudio = null, currentClipUrl = '';
 
 // ── Correct answers (for admin display) ───────────────────────────────────
 const ANSWERS = [
@@ -235,6 +244,24 @@ function checkGate() {
   } else {
     document.getElementById('gate-err').textContent = 'Wrong password — try again';
   }
+}
+
+function stopClip() {
+  if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; }
+  const btn = document.getElementById('clipBtn');
+  if (btn) { btn.style.background='#66BB6A'; document.getElementById('clipIcon').textContent='▶'; document.getElementById('clipLabel').textContent='Play Clip'; }
+}
+
+function toggleClip() {
+  if (currentAudio && !currentAudio.paused) { stopClip(); return; }
+  stopClip();
+  currentAudio = new Audio(currentClipUrl);
+  currentAudio.play().catch(e => alert('Audio error: ' + e.message));
+  const btn = document.getElementById('clipBtn');
+  btn.style.background = '#FF7043';
+  document.getElementById('clipIcon').textContent = '⏹';
+  document.getElementById('clipLabel').textContent = 'Playing… (tap to stop)';
+  currentAudio.onended = stopClip;
 }
 
 function promptAdmin() {
@@ -302,6 +329,18 @@ async function loadQuestion() {
     document.getElementById('playQMeta').textContent = `Round ${data.round} · Q${data.questionNum} of ${data.totalQuestions}`;
     document.getElementById('playQText').textContent = data.question || 'Waiting for next question…';
     document.getElementById('playErr').style.display = 'none';
+
+    // Round 3 audio clip
+    const clipNum = String(data.questionNum).padStart(2,'0');
+    const clipPlayer = document.getElementById('clipPlayer');
+    if (data.round === 3 && data.question) {
+      clipPlayer.style.display = 'block';
+      currentClipUrl = `${API}/audio/clip_${clipNum}.mp3`;
+      stopClip();
+    } else {
+      clipPlayer.style.display = 'none';
+      stopClip();
+    }
     const done = answeredKeys[currentKey];
     document.getElementById('alreadyMsg').style.display  = done ? 'block' : 'none';
     document.getElementById('submitBtn').style.display   = done ? 'none'  : 'block';
