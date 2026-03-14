@@ -2,764 +2,408 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script>
-  // Password gate — runs before anything renders
-  (function() {
-    const PASS = 'carlysbirthday';
-    const KEY  = 'trivia_auth';
-    if (sessionStorage.getItem(KEY) !== '1') {
-      document.addEventListener('DOMContentLoaded', function() {
-        document.body.style.display = 'none';
-        var gate = document.createElement('div');
-        gate.id = 'gate';
-        gate.innerHTML = [
-          '<style>',
-          '#gate{position:fixed;inset:0;background:#0F0F2A;display:flex;flex-direction:column;',
-          'align-items:center;justify-content:center;z-index:99999;font-family:Segoe UI,system-ui,sans-serif;color:#fff;}',
-          '#gate h2{font-size:2rem;margin-bottom:8px;color:#FFD600;}',
-          '#gate p{color:#AAAACC;margin-bottom:32px;font-size:1rem;}',
-          '#gate-form{display:flex;flex-direction:column;align-items:center;gap:16px;}',
-          '#gate-input{background:#1a1a3e;border:2px solid #444;border-radius:10px;',
-          'color:#fff;font-size:1.2rem;padding:14px 24px;width:260px;text-align:center;outline:none;}',
-          '#gate-input:focus{border-color:#FFD600;}',
-          '#gate-btn{background:#FFD600;color:#000;border:none;border-radius:10px;',
-          'font-size:1rem;font-weight:700;padding:13px 40px;cursor:pointer;width:260px;}',
-          '#gate-btn:hover{filter:brightness(1.1);}',
-          '#gate-err{color:#FF7043;font-size:0.9rem;min-height:1.2em;}',
-          '</style>',
-          '<h2>🎉 Family Trivia Night</h2>',
-          '<p>Enter the password to continue</p>',
-          '<div id="gate-form">',
-          '<input id="gate-input" type="password" placeholder="Password" autocomplete="off">',
-          '<button id="gate-btn" onclick="checkPass()">Enter</button>',
-          '<div id="gate-err"></div>',
-          '</div>'
-        ].join('');
-        document.body.appendChild(gate);
-        document.body.style.display = '';
-        document.getElementById('gate-input').addEventListener('keydown', function(e){
-          if(e.key==='Enter') checkPass();
-        });
-        setTimeout(function(){ document.getElementById('gate-input').focus(); }, 50);
-      });
-    }
-    window.checkPass = function() {
-      var val = document.getElementById('gate-input').value;
-      if (val === PASS) {
-        sessionStorage.setItem(KEY, '1');
-        document.getElementById('gate').remove();
-      } else {
-        var err = document.getElementById('gate-err');
-        err.textContent = 'Wrong password — try again.';
-        document.getElementById('gate-input').value = '';
-        document.getElementById('gate-input').focus();
-        setTimeout(function(){ err.textContent=''; }, 3000);
-      }
-    };
-  })();
-</script>
-<title>Family Trivia Night 🎉</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>🎉 Family Trivia Night</title>
 <style>
-  :root {
-    --bg: #0F0F2A;
-    --surface: #1a1a3e;
-    --surface2: #12122d;
-    --gold: #FFD600;
-    --r1: #29B6F6;
-    --r2: #FF7043;
-    --r3: #66BB6A;
-    --text: #FFFFFF;
-    --muted: #AAAACC;
-    --radius: 16px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  /* ── NAV ── */
-  #nav {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 24px;
-    background: var(--surface2);
-    border-bottom: 2px solid var(--gold);
-    flex-wrap: wrap;
-  }
-  #nav h1 { font-size: 1.1rem; font-weight: 700; color: var(--gold); flex: 1; white-space: nowrap; }
-  .round-btn {
-    padding: 8px 18px;
-    border-radius: 8px;
-    border: 2px solid transparent;
-    font-weight: 700;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all .2s;
-    background: transparent;
-    color: var(--text);
-  }
-  .round-btn[data-round="1"] { border-color: var(--r1); }
-  .round-btn[data-round="1"]:hover, .round-btn[data-round="1"].active { background: var(--r1); color: #000; }
-  .round-btn[data-round="2"] { border-color: var(--r2); }
-  .round-btn[data-round="2"]:hover, .round-btn[data-round="2"].active { background: var(--r2); color: #000; }
-  .round-btn[data-round="3"] { border-color: var(--r3); }
-  .round-btn[data-round="3"]:hover, .round-btn[data-round="3"].active { background: var(--r3); color: #000; }
-  #progress-label { font-size: 0.85rem; color: var(--muted); margin-left: auto; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0F0F2A;color:#fff;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
 
-  /* ── MAIN ── */
-  #main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 32px 24px;
-    text-align: center;
-    min-height: 0;
-  }
+/* ── Gate ── */
+#gate{position:fixed;inset:0;background:#0F0F2A;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:20px}
+#gate h2{color:#FFD600;font-size:2rem;margin-bottom:6px;text-align:center}
+#gate p{color:#AAAACC;margin-bottom:24px;text-align:center}
+.gate-input{width:100%;max-width:300px;background:#1A1A40;border:2px solid #333355;border-radius:9px;color:#fff;font-size:1rem;padding:12px 14px;outline:none;margin-bottom:10px;display:block}
+.gate-input:focus{border-color:#FFD600}
+.gate-btn{width:100%;max-width:300px;padding:13px;border-radius:9px;border:none;background:#FFD600;color:#0F0F2A;font-size:1.05rem;font-weight:800;cursor:pointer;display:block}
+#gate-err{color:#FF7043;min-height:1.4em;font-size:.88rem;text-align:center;margin-top:8px}
 
-  /* ── WELCOME ── */
-  #welcome { max-width: 700px; }
-  #welcome h2 { font-size: 3rem; margin-bottom: 12px; }
-  #welcome p { color: var(--muted); margin-bottom: 32px; font-size: 1.1rem; }
-  .start-grid { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
-  .start-card {
-    padding: 28px 32px;
-    border-radius: var(--radius);
-    border: 2px solid;
-    cursor: pointer;
-    transition: all .2s;
-    min-width: 180px;
-  }
-  .start-card:hover { transform: translateY(-4px); filter: brightness(1.15); }
-  .start-card .emoji { font-size: 2.5rem; margin-bottom: 8px; }
-  .start-card h3 { font-size: 1.05rem; }
+/* ── Layout tabs ── */
+.tabs{display:flex;background:#111128;border-bottom:2px solid #222244;position:sticky;top:0;z-index:100}
+.tab{flex:1;padding:14px 8px;text-align:center;font-weight:700;font-size:.9rem;color:#AAAACC;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s}
+.tab.active{color:#FFD600;border-bottom-color:#FFD600;background:#0F0F2A}
+.tab-content{display:none;padding:18px 16px;max-width:600px;margin:0 auto}
+.tab-content.active{display:block}
 
-  /* ── ROUND HEADER ── */
-  #round-header {
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    opacity: .7;
-  }
-  #q-counter {
-    font-size: 0.85rem;
-    color: var(--muted);
-    margin-bottom: 24px;
-  }
+/* ── Shared ── */
+.card{background:#1A1A40;border-radius:14px;padding:16px;margin-bottom:12px}
+label,.lbl{display:block;color:#AAAACC;font-size:.72rem;margin-bottom:5px;text-transform:uppercase;letter-spacing:.08em}
+input[type=text],input[type=password],input[type=number],textarea,select{width:100%;background:#0F0F2A;border:2px solid #333355;border-radius:9px;color:#fff;font-size:1rem;padding:10px 13px;outline:none;transition:border-color .2s}
+input:focus,textarea:focus,select:focus{border-color:#FFD600}
+textarea{resize:vertical;min-height:72px}
+.btn{width:100%;padding:13px;border-radius:9px;border:none;background:#FFD600;color:#0F0F2A;font-size:1rem;font-weight:800;cursor:pointer;margin-top:8px;transition:opacity .2s}
+.btn:hover{opacity:.88}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-blue{background:#29B6F6}
+.btn-green{background:#66BB6A}
+.btn-red{background:#FF7043;color:#fff}
+.btn-sm{padding:7px 14px;font-size:.82rem;width:auto;margin-top:0}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
-  /* ── QUESTION CARD ── */
-  #q-card {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: 40px 52px;
-    max-width: 860px;
-    width: 100%;
-    border: 2px solid var(--surface2);
-    margin-bottom: 28px;
-    line-height: 1.5;
-    transition: border-color .3s;
-  }
-  #q-card.r1 { border-color: var(--r1); }
-  #q-card.r2 { border-color: var(--r2); }
-  #q-card.r3 { border-color: var(--r3); }
-  #q-text {
-    font-size: 1.65rem;
-    font-weight: 600;
-    white-space: pre-line;
-    margin-bottom: 0;
-  }
+/* ── Question box ── */
+.q-box{background:#0F0F2A;border:2px solid #29B6F6;border-radius:12px;padding:14px;margin-bottom:12px}
+.q-box .ql{color:#29B6F6;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.q-box .qm{color:#AAAACC;font-size:.8rem;margin-bottom:6px}
+.q-box .qt{font-size:1.05rem;font-weight:700;line-height:1.5;white-space:pre-line}
 
-  /* ── ANSWER PANEL ── */
-  #a-panel {
-    background: #1c2b1c;
-    border: 2px solid var(--r3);
-    border-radius: var(--radius);
-    padding: 22px 40px;
-    max-width: 860px;
-    width: 100%;
-    margin-bottom: 28px;
-    opacity: 0;
-    transform: translateY(12px);
-    transition: opacity .3s, transform .3s;
-    pointer-events: none;
-  }
-  #a-panel.visible {
-    opacity: 1;
-    transform: none;
-    pointer-events: auto;
-  }
-  #a-panel .a-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--r3); margin-bottom: 6px; }
-  #a-text { font-size: 1.45rem; font-weight: 700; color: #a5d6a7; }
+/* ── Feedback ── */
+.fb{display:none;padding:12px;border-radius:10px;margin-top:10px;font-weight:700;font-size:.95rem;text-align:center}
+.fb.correct{background:#1B4332;border:2px solid #66BB6A;color:#66BB6A}
+.fb.partial{background:#3B2800;border:2px solid #FFD600;color:#FFD600}
+.fb.wrong{background:#3B1A1A;border:2px solid #FF7043;color:#FF7043}
+.badge{background:#29B6F6;color:#0F0F2A;border-radius:50px;padding:2px 11px;font-weight:800;font-size:.9rem;display:inline-block;margin-left:5px}
 
-  /* ── AUDIO PLAYER ── */
-  #audio-player {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-  #audio-play-btn {
-    width: 90px; height: 90px;
-    border-radius: 50%;
-    border: none;
-    background: var(--r3);
-    color: #0a2e0a;
-    font-size: 2.4rem;
-    cursor: pointer;
-    transition: all .2s;
-    box-shadow: 0 4px 24px rgba(102,187,106,0.4);
-    display: flex; align-items: center; justify-content: center;
-  }
-  #audio-play-btn:hover { transform: scale(1.07); filter: brightness(1.12); }
-  #audio-play-btn.playing {
-    background: #FF7043;
-    color: #fff;
-    box-shadow: 0 4px 28px rgba(255,112,67,0.55);
-    animation: pulse-btn 1.3s ease-in-out infinite;
-  }
-  @keyframes pulse-btn {
-    0%,100% { box-shadow: 0 4px 24px rgba(255,112,67,0.45); }
-    50%      { box-shadow: 0 6px 36px rgba(255,112,67,0.8); }
-  }
-  #audio-status {
-    font-size: 0.85rem;
-    color: var(--muted);
-    letter-spacing: .04em;
-    min-height: 1.2em;
-  }
+/* ── Score strip ── */
+.score-strip{background:#1A1A40;border-radius:12px;padding:12px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.score-strip .val{color:#FFD600;font-size:1.5rem;font-weight:900}
 
-  /* ── CONTROLS ── */
-  #controls { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; align-items: center; }
-  .btn {
-    padding: 12px 28px;
-    border-radius: 10px;
-    border: none;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all .15s;
-  }
-  .btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
-  .btn:active { transform: translateY(0); }
-  .btn-reveal { background: var(--gold); color: #000; }
-  .btn-next   { background: #2e7d32; color: #fff; }
-  .btn-prev   { background: #333; color: #fff; }
-  .btn-play   { background: var(--r3); color: #000; }
-  .btn-home   { background: transparent; border: 2px solid var(--muted); color: var(--muted); }
+/* ── Scoreboard ── */
+.team-row{background:#0F0F2A;border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px}
+.team-row.gold{border:2px solid #FFD600}
+.team-row.silver{border:2px solid #AAAACC}
+.team-row.bronze{border:2px solid #FF7043}
+.tr-rank{font-size:1.6rem;width:36px;text-align:center}
+.tr-name{flex:1;font-weight:700}
+.tr-score{color:#FFD600;font-size:1.4rem;font-weight:900}
+.tr-answers{color:#AAAACC;font-size:.75rem}
 
-  /* ── DOTS ── */
-  #dots {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-    flex-wrap: wrap;
-    max-width: 860px;
-    margin-top: 20px;
-  }
-  .dot {
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: var(--surface);
-    border: 2px solid var(--muted);
-    cursor: pointer;
-    transition: background .2s;
-  }
-  .dot.current { border-color: var(--gold); background: var(--gold); }
-  .dot.done    { background: #444; border-color: #555; }
-
-  /* ── SCOREBOARD SIDEBAR ── */
-  #score-toggle {
-    position: fixed; top: 70px; right: 0;
-    background: var(--gold); color: #000;
-    font-weight: 700; font-size: 0.8rem;
-    padding: 8px 10px;
-    border-radius: 8px 0 0 8px;
-    cursor: pointer;
-    z-index: 100;
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    letter-spacing: .05em;
-  }
-  #scoreboard {
-    position: fixed; top: 0; right: -320px;
-    width: 300px; height: 100vh;
-    background: var(--surface2);
-    border-left: 2px solid var(--gold);
-    z-index: 200;
-    padding: 24px 20px;
-    transition: right .3s;
-    overflow-y: auto;
-  }
-  #scoreboard.open { right: 0; }
-  #scoreboard h3 { color: var(--gold); margin-bottom: 16px; font-size: 1.1rem; }
-  .team-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .team-name { flex: 1; font-size: 0.95rem; }
-  .team-score {
-    font-size: 1.1rem; font-weight: 700;
-    background: var(--surface); border-radius: 6px;
-    padding: 4px 12px; min-width: 44px; text-align: center;
-    color: var(--gold);
-  }
-  .score-adj { background: none; border: none; color: var(--muted); font-size: 1.1rem; cursor: pointer; padding: 2px 6px; }
-  .score-adj:hover { color: var(--gold); }
-  #add-team-row { display: flex; gap: 8px; margin-top: 16px; }
-  #new-team-name { flex: 1; background: var(--surface); border: 1px solid var(--muted); border-radius: 6px; padding: 8px; color: var(--text); font-size: 0.9rem; }
-  #add-team-btn { background: var(--gold); color: #000; border: none; border-radius: 6px; padding: 8px 14px; font-weight: 700; cursor: pointer; }
-  #score-close { position: absolute; top: 12px; right: 12px; background: none; border: none; color: var(--muted); font-size: 1.3rem; cursor: pointer; }
-
-  /* ── FULLSCREEN ── */
-  #fs-btn {
-    position: fixed; bottom: 16px; right: 16px;
-    background: rgba(255,255,255,0.1); border: none;
-    color: var(--muted); font-size: 1.2rem;
-    padding: 8px 12px; border-radius: 8px; cursor: pointer;
-    z-index: 50;
-  }
-  #fs-btn:hover { background: rgba(255,255,255,0.2); }
-
-  /* ── KEYBOARD HINT ── */
-  #kb-hint { position: fixed; bottom: 16px; left: 16px; font-size: 0.72rem; color: #555; }
-
-  @media (max-width: 600px) {
-    #q-card { padding: 24px 20px; }
-    #q-text { font-size: 1.25rem; }
-    #a-text { font-size: 1.1rem; }
-    .btn { padding: 10px 18px; font-size: 0.9rem; }
-  }
+/* ── Admin answers ── */
+.ar{background:#0F0F2A;border-radius:9px;padding:11px 13px;margin-bottom:8px}
+.ar-top{display:flex;gap:10px;align-items:center;margin-bottom:6px}
+.ar-team{font-weight:800;font-size:.9rem}
+.ar-answer{color:#DDDDE8;font-size:.88rem;flex:1}
+.ar-pts{color:#FFD600;font-weight:900;font-size:1.1rem;min-width:28px;text-align:right}
+.ar-fb{color:#AAAACC;font-size:.75rem;margin-bottom:6px}
+.ar-correct{color:#66BB6A;font-size:.8rem;margin-bottom:8px;font-weight:600}
+.chip{display:inline-block;padding:2px 8px;border-radius:50px;font-size:.7rem;font-weight:700}
+.chip-ai{background:#3B2800;color:#FFD600}
+.chip-ok{background:#1B4332;color:#66BB6A}
+.empty{color:#AAAACC;font-size:.9rem;text-align:center;padding:20px}
+.pulse{animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.conn-err{color:#FF7043;font-size:.8rem;text-align:center;margin-top:6px;display:none}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav id="nav">
-  <h1>🎉 Family Trivia Night</h1>
-  <button class="round-btn" data-round="1" onclick="startRound(1)">🧠 Round 1</button>
-  <button class="round-btn" data-round="2" onclick="startRound(2)">🎬 Round 2</button>
-  <button class="round-btn" data-round="3" onclick="startRound(3)">🎵 Round 3</button>
-  <span id="progress-label"></span>
-</nav>
+<!-- Gate -->
+<div id="gate">
+  <h2>🎉 Family Trivia Night</h2>
+  <p>Enter tonight's password to join</p>
+  <input class="gate-input" type="password" id="gate-input" placeholder="Password" autocomplete="off">
+  <button class="gate-btn" onclick="checkGate()">Enter →</button>
+  <div id="gate-err"></div>
+</div>
 
-<!-- SCORE TOGGLE -->
-<button id="score-toggle" onclick="toggleScore()">SCORE&shy;BOARD</button>
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('play')">🎮 Play</div>
+  <div class="tab" onclick="showTab('scores')">📊 Scores</div>
+  <div class="tab" id="adminTab" onclick="showTab('admin')" style="display:none">🔧 Admin</div>
+</div>
 
-<!-- SCOREBOARD SIDEBAR -->
-<div id="scoreboard">
-  <button id="score-close" onclick="toggleScore()">✕</button>
-  <h3>🏆 Scoreboard</h3>
-  <div id="teams-list"></div>
-  <div id="add-team-row">
-    <input id="new-team-name" placeholder="Team name..." maxlength="20">
-    <button id="add-team-btn" onclick="addTeam()">+ Add</button>
+<!-- ══ PLAY TAB ══════════════════════════════════════════════════════════ -->
+<div class="tab-content active" id="tab-play">
+
+  <div class="score-strip" id="scoreStrip" style="display:none">
+    <div><div class="lbl">Team</div><div style="font-weight:700;font-size:.95rem" id="teamDisplay">—</div></div>
+    <div style="text-align:right"><div class="lbl">Score</div><div class="val" id="scoreDisplay">0</div></div>
+  </div>
+
+  <div class="card" id="joinCard">
+    <label>Your Team Name</label>
+    <input type="text" id="teamName" placeholder="e.g. The Murphys" maxlength="30">
+    <button class="btn" id="joinBtn" onclick="registerTeam()">Join Game →</button>
+  </div>
+
+  <div id="gameSection" style="display:none">
+    <div class="q-box">
+      <div class="ql">Current Question</div>
+      <div class="qm" id="playQMeta">—</div>
+      <div class="qt" id="playQText">Loading…</div>
+    </div>
+    <div class="card">
+      <label>Your Answer</label>
+      <textarea id="answerText" placeholder="Type your answer…" rows="3"></textarea>
+      <div id="alreadyMsg" style="display:none;color:#66BB6A;font-size:.85rem;margin-top:8px">✅ Already answered this question!</div>
+      <button class="btn" id="submitBtn" onclick="submitAnswer()">Submit Answer ✓</button>
+      <div class="fb" id="playFb"></div>
+    </div>
+    <div class="conn-err" id="playErr">⚠ Connection issue — retrying…</div>
   </div>
 </div>
 
-<!-- MAIN -->
-<main id="main">
+<!-- ══ SCORES TAB ════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-scores">
+  <div class="q-box">
+    <div class="ql">Question on Screen</div>
+    <div class="qm" id="sbQMeta">—</div>
+    <div class="qt" id="sbQText">Loading…</div>
+  </div>
+  <div id="scoresList"><div class="empty pulse">Waiting for teams…</div></div>
+  <div class="conn-err" id="sbErr">⚠ Connection issue — retrying…</div>
+</div>
 
-  <!-- WELCOME -->
-  <div id="welcome">
-    <h2>🎉 Family Trivia Night</h2>
-    <p>Three rounds. One champion. Absolutely no cheating.</p>
-    <div class="start-grid">
-      <div class="start-card" style="border-color:var(--r1)" onclick="startRound(1)">
-        <div class="emoji">🧠</div>
-        <h3>Round 1<br><small style="font-weight:400;font-size:.85rem;color:var(--muted)">General Trivia</small></h3>
-      </div>
-      <div class="start-card" style="border-color:var(--r2)" onclick="startRound(2)">
-        <div class="emoji">🎬</div>
-        <h3>Round 2<br><small style="font-weight:400;font-size:.85rem;color:var(--muted)">Cartoons & Movies</small></h3>
-      </div>
-      <div class="start-card" style="border-color:var(--r3)" onclick="startRound(3)">
-        <div class="emoji">🎵</div>
-        <h3>Round 3<br><small style="font-weight:400;font-size:.85rem;color:var(--muted)">Name That Tune</small></h3>
-      </div>
+<!-- ══ ADMIN TAB ══════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-admin">
+
+  <!-- Current Q + nav -->
+  <div class="card">
+    <div class="lbl" style="margin-bottom:10px">Current Question</div>
+    <div class="q-box" style="margin-bottom:10px">
+      <div class="qm" id="adminQMeta">—</div>
+      <div class="qt" id="adminQText">—</div>
+      <div style="color:#66BB6A;font-size:.82rem;margin-top:6px;font-weight:600" id="adminQAnswer"></div>
+    </div>
+    <div class="row">
+      <button class="btn btn-blue btn-sm" onclick="nextQ()">▶ Next Question</button>
+      <select id="gotoRound" style="flex:1">
+        <option value="1">Round 1 — General</option>
+        <option value="2">Round 2 — Cartoons</option>
+        <option value="3">Round 3 — Name That Tune</option>
+      </select>
+      <input type="number" id="gotoQ" min="1" max="15" value="1" style="width:58px">
+      <button class="btn btn-sm" onclick="gotoQ()" style="background:#AAAACC;color:#0F0F2A">Go</button>
     </div>
   </div>
 
-  <!-- QUESTION VIEW (hidden initially) -->
-  <div id="question-view" style="display:none; width:100%; max-width:900px; display:none; flex-direction:column; align-items:center;">
-    <div id="round-header"></div>
-    <div id="q-counter"></div>
-    <div id="audio-player">
-      <button id="audio-play-btn" onclick="toggleAudio()">▶</button>
-      <div id="audio-status"></div>
-    </div>
-    <audio id="audio-el" preload="none"></audio>
-    <div id="q-card"><div id="q-text"></div></div>
-    <div id="a-panel"><div class="a-label">✅ Answer</div><div id="a-text"></div></div>
-    <div id="controls">
-      <button class="btn btn-prev" onclick="prevQ()">← Prev</button>
-      <button class="btn btn-reveal" onclick="revealAnswer()">Reveal Answer</button>
-      <button class="btn btn-play" id="play-btn" style="display:none">▶ Play Clip</button>
-      <button class="btn btn-next" onclick="nextQ()">Next →</button>
-      <button class="btn btn-home" onclick="goHome()">🏠</button>
-    </div>
-    <div id="dots"></div>
+  <!-- Answers this question -->
+  <div class="card">
+    <div class="lbl" style="margin-bottom:10px">Submitted Answers <span id="ansCount" style="color:#AAAACC;font-weight:400"></span></div>
+    <div id="adminAnswers"><div class="empty">No answers yet</div></div>
   </div>
 
-</main>
+  <!-- Scores -->
+  <div class="card">
+    <div class="lbl" style="margin-bottom:10px">Live Scores</div>
+    <div id="adminScores"><div class="empty">No teams yet</div></div>
+  </div>
 
-<!-- FULLSCREEN BTN -->
-<button id="fs-btn" onclick="toggleFS()" title="Fullscreen">⛶</button>
-<div id="kb-hint">← → Space=reveal  F=fullscreen  S=scoreboard</div>
+  <!-- Reset -->
+  <div class="card" style="border:1px solid #FF7043">
+    <button class="btn btn-red btn-sm" onclick="resetAll()">🗑 Reset All Scores</button>
+  </div>
+</div>
 
 <script>
-// ─────────────────────────────────────────────────────────────────────────────
-// DATA
-// ─────────────────────────────────────────────────────────────────────────────
-const ROUND1 = [
-  ["What year did the Berlin Wall fall?", "1989"],
-  ["Which chemical element has the symbol Au?", "Gold"],
-  ["How many bones are in the adult human body?", "206"],
-  ["What is the only country in the world that borders both France and Spain?", "Andorra"],
-  ["What is the powerhouse of the cell?", "The mitochondria"],
-  ["What year did the first iPhone launch?", "2007"],
-  ["Which Shakespeare play features the line 'Et tu, Brute'?", "Julius Caesar"],
-  ["What is the largest desert in the world by total area?", "Antarctica — it's a cold desert! (Sahara is the largest hot desert)"],
-  ["What is the longest bone in the human body?", "The femur (thigh bone)"],
-  ["Which country gifted the Statue of Liberty to the United States?", "France"],
-  ["How many sides does a dodecagon have?", "12"],
-  ["Which planet has the most confirmed moons in our solar system?", "Saturn (146+ confirmed moons)"],
-  ["What year did Google officially launch?", "1998"],
-  ["What is the most consumed beverage in the world after water?", "Tea"],
-  ["In Morse code, what does ··· — ··· represent?", "SOS"],
+const API  = 'https://murphy-rog-zephyrus-g14-ga401qm-ga401qm.tail9c7ab.ts.net';
+const PKEY = 'carlysbirthday';
+const AKEY = 'hilary21';
+
+let teamName = '', totalScore = 0, answeredKeys = {}, currentKey = '';
+let isAdmin = false;
+let activeTab = 'play';
+
+// ── Correct answers (for admin display) ───────────────────────────────────
+const ANSWERS = [
+  ["1989","Gold","206","Andorra","The mitochondria","2007","Julius Caesar","Antarctica","The femur","France","12","Saturn","1998","Tea","SOS"],
+  ["Appa","1995","Robin Williams","Buddy Pine","Auguste Gusteau","Sid Phillips","Rufus","Waste Allocation Load Lifter Earth-Class","A meerkat","Joy, Sadness, Anger, Fear, Disgust","Cynthia","Mr. Krabs","Casita","Bandit","Doofenshmirtz Evil Incorporated!"],
+  ["Poor Unfortunate Souls – The Little Mermaid","For the First Time in Forever – Frozen","I Won't Say I'm in Love – Hercules","Can You Feel the Love Tonight – The Lion King","Colors of the Wind – Pocahontas","Go the Distance – Hercules","Friend Like Me – Aladdin","How Far I'll Go – Moana","Shiny – Moana","When She Loved Me – Toy Story 2","This Is Halloween – Nightmare Before Christmas","Surface Pressure – Encanto","Try Everything – Zootopia","Mother Knows Best – Tangled","Touch the Sky – Brave"]
 ];
 
-const ROUND2 = [
-  ["In Avatar: The Last Airbender, what is the name of Aang's flying sky bison?", "Appa"],
-  ["What year did the original Toy Story release in theatres?", "1995"],
-  ["Who voiced Genie in the original 1992 Aladdin?", "Robin Williams"],
-  ["In The Incredibles, what is Syndrome's real birth name?", "Buddy Pine"],
-  ["In Ratatouille, what is the name of the legendary chef Remy idolizes?", "Auguste Gusteau"],
-  ["What is the full name of the bully kid in the original Toy Story?", "Sid Phillips"],
-  ["In Kim Possible, what is the name of her naked mole rat sidekick?", "Rufus"],
-  ["What does WALL-E stand for?", "Waste Allocation Load Lifter: Earth-Class"],
-  ["In The Lion King, what type of animal is Timon?", "A meerkat"],
-  ["Name all 5 original emotions in Pixar's Inside Out.", "Joy, Sadness, Anger, Fear, Disgust"],
-  ["In Rugrats, what is the name of Angelica's favourite doll?", "Cynthia"],
-  ["In SpongeBob SquarePants, who is the owner of the Krusty Krab?", "Mr. Krabs (Eugene Krabs)"],
-  ["In Encanto, what is the name of the Madrigal family's magical home?", "Casita"],
-  ["What is the name of Bluey's dad?", "Bandit"],
-  ["In Phineas and Ferb, what does Dr. Doofenshmirtz's jingle always end with?", '"Doofenshmirtz Evil Incorporated!"'],
-];
+// ── Gate ──────────────────────────────────────────────────────────────────
+document.getElementById('gate-input').addEventListener('keydown', e => { if(e.key==='Enter') checkGate(); });
 
-// Round 3: [hint_lyric, answer, clip_file]
-// Clips are pre-trimmed — already start past the title lyric
-const ROUND3 = [
-  [
-    '🎵  "The men up there don\'t like a lot of blabber,\nthey think a girl who gossips is a bore!"\n\nName the song & movie!',
-    '"Poor Unfortunate Souls" – Ursula / The Little Mermaid (1989)',
-    "audio/clip_01.mp3"
-  ],
-  [
-    '🎵  "For years I\'ve roamed these empty halls,\nwhy have a ballroom with no balls?"\n\nName the song & movie!',
-    '"For the First Time in Forever" – Anna / Frozen (2013)',
-    "audio/clip_02.mp3"
-  ],
-  [
-    '🎵  "If there\'s a prize for rotten judgement,\nI guess I\'ve already won that!"\n\nName the song & movie!',
-    '"I Won\'t Say (I\'m in Love)" – Megara / Hercules (1997)',
-    "audio/clip_03.mp3"
-  ],
-  [
-    '🎵  "There\'s a calm surrender\nto the rush of day…"\n\nName the song & movie!',
-    '"Can You Feel the Love Tonight" – The Lion King (1994)',
-    "audio/clip_04.mp3"
-  ],
-  [
-    '🎵  "You think you own whatever land you land on,\nthe earth is just a dead thing you can claim…"\n\nName the song & movie!',
-    '"Colors of the Wind" – Pocahontas (1995)',
-    "audio/clip_05.mp3"
-  ],
-  [
-    '🎵  "I have often dreamed\nof a far-off place,\nwhere a great warm welcome\nwill be waiting for me…"\n\nName the song & movie!',
-    '"Go the Distance" – Hercules (1997)',
-    "audio/clip_06.mp3"
-  ],
-  [
-    '🎵  "Well Ali Baba had them forty thieves,\nScheherazade had a thousand tales…"\n\nName the song & movie!',
-    '"Friend Like Me" – Genie / Aladdin (1992)',
-    "audio/clip_07.mp3"
-  ],
-  [
-    '🎵  "I\'ve been staring at the edge of the water,\nlong as I can remember, never really knowing why…"\n\nName the song & movie!',
-    '"How Far I\'ll Go" – Auli\'i Cravalho / Moana (2016)',
-    "audio/clip_08.mp3"
-  ],
-  [
-    '🎵  "Well Tamatoa hasn\'t always been this glam,\nI was a drab little crab once…"\n\nName the song & movie!',
-    '"Shiny" – Tamatoa / Moana (2016)',
-    "audio/clip_09.mp3"
-  ],
-  [
-    '🎵  "When somebody loved me,\neverything was beautiful…\nEvery hour we spent together\nlives within my heart…"\n\nName the song & movie!',
-    '"When She Loved Me" – Sarah McLachlan / Toy Story 2 (1999)',
-    "audio/clip_10.mp3"
-  ],
-  [
-    '🎵  "Boys and girls of every age,\nwouldn\'t you like to see something strange?"\n\nName the song & movie!',
-    '"This Is Halloween" – The Nightmare Before Christmas (1993)',
-    "audio/clip_11.mp3"
-  ],
-  [
-    '🎵  "I\'m the strong one, I\'m not nervous,\nI am fine with where I am…"\n\nName the song & movie!',
-    '"Surface Pressure" – Luisa / Encanto (2021)',
-    "audio/clip_12.mp3"
-  ],
-  [
-    '🎵  "I messed up tonight,\nI lost another fight…\nI\'ll try everything!"\n\nName the song & movie!',
-    '"Try Everything" – Shakira / Zootopia (2016)',
-    "audio/clip_13.mp3"
-  ],
-  [
-    '🎵  "You are my greatest gift,\nI wrapped you in clover,\nI kept you safe and warm…"\n\nName the song & movie!',
-    '"Mother Knows Best" – Mother Gothel / Tangled (2010)',
-    "audio/clip_14.mp3"
-  ],
-  [
-    '🎵  "When the wind is in my hair,\nand the fire\'s in the air,\nI know my destiny\'s there…"\n\nName the song & movie!',
-    '"Touch the Sky" – Brave / Pixar (2012)',
-    "audio/clip_15.mp3"
-  ],
-];
+// Auto-restore session
+(function init() {
+  const auth = sessionStorage.getItem('ta');
+  if (auth) {
+    document.getElementById('gate').style.display = 'none';
+    if (auth === 'admin') { isAdmin = true; document.getElementById('adminTab').style.display = ''; }
+    const saved = localStorage.getItem('trivia_team');
+    if (saved) { document.getElementById('teamName').value = saved; registerTeam(true); }
+    startPolling();
+  }
+})();
 
-const ROUNDS = [null, ROUND1, ROUND2, ROUND3];
-const ROUND_COLORS = [null, 'r1', 'r2', 'r3'];
-const ROUND_TITLES = [null, '🧠 Round 1 — General Trivia', '🎬 Round 2 — Cartoons & Movies', '🎵 Round 3 — Name That Tune'];
-
-// ─────────────────────────────────────────────────────────────────────────────
-// STATE
-// ─────────────────────────────────────────────────────────────────────────────
-let currentRound = 0;
-let currentQ = 0;
-let answered = {};  // "round-q" → true
-let teams = JSON.parse(localStorage.getItem('trivia_teams') || '[]');
-let scoreOpen = false;
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ROUTING
-// ─────────────────────────────────────────────────────────────────────────────
-function goHome() {
-  stopAudio();
-  currentRound = 0;
-  document.getElementById('welcome').style.display = 'block';
-  document.getElementById('question-view').style.display = 'none';
-  document.getElementById('progress-label').textContent = '';
-  document.querySelectorAll('.round-btn').forEach(b => b.classList.remove('active'));
-}
-
-function startRound(r) {
-  currentRound = r;
-  currentQ = 0;
-  document.getElementById('welcome').style.display = 'none';
-  const qv = document.getElementById('question-view');
-  qv.style.display = 'flex';
-  document.querySelectorAll('.round-btn').forEach(b => {
-    b.classList.toggle('active', parseInt(b.dataset.round) === r);
-  });
-  renderQuestion();
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// RENDER
-// ─────────────────────────────────────────────────────────────────────────────
-function renderQuestion() {
-  stopAudio();
-  const data = ROUNDS[currentRound];
-  const total = data.length;
-  const row = data[currentQ];
-  const isR3 = currentRound === 3;
-  const key = `${currentRound}-${currentQ}`;
-  const wasAnswered = answered[key];
-
-  // Header & counter
-  document.getElementById('round-header').textContent = ROUND_TITLES[currentRound];
-  document.getElementById('round-header').style.color = `var(--${ROUND_COLORS[currentRound]})`;
-  document.getElementById('q-counter').textContent = `Question ${currentQ + 1} of ${total}`;
-  document.getElementById('progress-label').textContent = `Q ${currentQ+1}/${total}`;
-
-  // Card colour
-  const card = document.getElementById('q-card');
-  card.className = ROUND_COLORS[currentRound];
-
-  // Question text
-  const qText = isR3 ? row[0] : row[0];
-  document.getElementById('q-text').textContent = qText;
-
-  // Answer
-  const aText = isR3 ? row[1] : row[1];
-  document.getElementById('a-text').textContent = aText;
-  const ap = document.getElementById('a-panel');
-  if (wasAnswered) {
-    ap.classList.add('visible');
+function checkGate() {
+  const v = document.getElementById('gate-input').value.trim();
+  if (v === AKEY) {
+    isAdmin = true;
+    sessionStorage.setItem('ta','admin');
+    document.getElementById('adminTab').style.display = '';
+    document.getElementById('gate').style.display = 'none';
+    const saved = localStorage.getItem('trivia_team');
+    if (saved) { document.getElementById('teamName').value = saved; registerTeam(true); }
+    startPolling();
+  } else if (v.toLowerCase() === PKEY) {
+    sessionStorage.setItem('ta','player');
+    document.getElementById('gate').style.display = 'none';
+    const saved = localStorage.getItem('trivia_team');
+    if (saved) { document.getElementById('teamName').value = saved; registerTeam(true); }
+    startPolling();
   } else {
-    ap.classList.remove('visible');
-  }
-
-  // Audio player
-  const audioPlayer = document.getElementById('audio-player');
-  const playBtn = document.getElementById('play-btn');
-  playBtn.style.display = 'none';
-  if (isR3) {
-    audioPlayer.style.display = 'flex';
-    const audioEl = document.getElementById('audio-el');
-    audioEl.src = row[2];
-    audioEl.load();
-    document.getElementById('audio-status').textContent = '';
-  } else {
-    audioPlayer.style.display = 'none';
-  }
-
-  // Dots
-  renderDots(total);
-}
-
-function renderDots(total) {
-  const container = document.getElementById('dots');
-  container.innerHTML = '';
-  for (let i = 0; i < total; i++) {
-    const d = document.createElement('div');
-    d.className = 'dot' + (i === currentQ ? ' current' : '') + (answered[`${currentRound}-${i}`] ? ' done' : '');
-    d.title = `Q${i+1}`;
-    d.onclick = (e => { const idx = i; return () => { stopAudio(); currentQ = idx; renderQuestion(); }; })(i);
-    container.appendChild(d);
+    document.getElementById('gate-err').textContent = 'Wrong password — try again';
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// NAVIGATION
-// ─────────────────────────────────────────────────────────────────────────────
-function nextQ() {
-  const total = ROUNDS[currentRound].length;
-  if (currentQ < total - 1) { currentQ++; renderQuestion(); }
-}
-function prevQ() {
-  if (currentQ > 0) { currentQ--; renderQuestion(); }
-}
-function revealAnswer() {
-  const key = `${currentRound}-${currentQ}`;
-  answered[key] = true;
-  document.getElementById('a-panel').classList.add('visible');
-  renderDots(ROUNDS[currentRound].length);
+// ── Tabs ──────────────────────────────────────────────────────────────────
+function showTab(t) {
+  activeTab = t;
+  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', ['play','scores','admin'][i]===t));
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// AUDIO
-// ─────────────────────────────────────────────────────────────────────────────
-function toggleAudio() {
-  const audioEl = document.getElementById('audio-el');
-  const btn     = document.getElementById('audio-play-btn');
-  const status  = document.getElementById('audio-status');
-  if (audioEl.paused) {
-    audioEl.play().catch(err => { status.textContent = 'Playback error: ' + err.message; });
-    btn.textContent = '⏹';
-    btn.classList.add('playing');
-    status.textContent = '♪  Now playing…';
-    audioEl.onended = () => {
-      btn.textContent = '▶';
-      btn.classList.remove('playing');
-      status.textContent = '✓  Done';
-    };
-  } else {
-    audioEl.pause();
-    audioEl.currentTime = 0;
-    btn.textContent = '▶';
-    btn.classList.remove('playing');
-    status.textContent = '';
-  }
-}
-function stopAudio() {
-  const audioEl = document.getElementById('audio-el');
-  const btn     = document.getElementById('audio-play-btn');
-  const status  = document.getElementById('audio-status');
-  if (audioEl) { audioEl.pause(); audioEl.currentTime = 0; audioEl.src = ''; }
-  if (btn)     { btn.textContent = '▶'; btn.classList.remove('playing'); }
-  if (status)  { status.textContent = ''; }
+// ── API helper ─────────────────────────────────────────────────────────────
+async function api(path, method='GET', body=null, key=PKEY) {
+  const opts = { method, headers:{'Content-Type':'application/json','x-api-key':key} };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API+path, opts);
+  if (!res.ok) throw new Error(res.status);
+  return res.json();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SCOREBOARD
-// ─────────────────────────────────────────────────────────────────────────────
-function toggleScore() {
-  scoreOpen = !scoreOpen;
-  document.getElementById('scoreboard').classList.toggle('open', scoreOpen);
-  renderTeams();
-}
-function saveTeams() { localStorage.setItem('trivia_teams', JSON.stringify(teams)); }
-function addTeam() {
-  const inp = document.getElementById('new-team-name');
-  const name = inp.value.trim();
-  if (!name) return;
-  teams.push({ name, score: 0 });
-  inp.value = '';
-  saveTeams();
-  renderTeams();
-}
-function adjustScore(i, delta) {
-  teams[i].score = Math.max(0, teams[i].score + delta);
-  saveTeams();
-  renderTeams();
-}
-function removeTeam(i) {
-  if (confirm(`Remove ${teams[i].name}?`)) {
-    teams.splice(i, 1);
-    saveTeams();
-    renderTeams();
+// ── Register team ─────────────────────────────────────────────────────────
+async function registerTeam(silent=false) {
+  const name = document.getElementById('teamName').value.trim();
+  if (!name) { if(!silent) alert('Enter your team name!'); return; }
+  const btn = document.getElementById('joinBtn');
+  if(btn){ btn.disabled=true; btn.textContent='Joining…'; }
+  try {
+    const data = await api('/api/register','POST',{ team:name });
+    teamName = data.name;
+    totalScore = data.score;
+    answeredKeys = {};
+    (data.answeredQuestions||[]).forEach(k => answeredKeys[k]=true);
+    localStorage.setItem('trivia_team', teamName);
+    document.getElementById('teamDisplay').textContent = teamName;
+    document.getElementById('scoreDisplay').textContent = totalScore;
+    document.getElementById('scoreStrip').style.display = 'flex';
+    document.getElementById('joinCard').style.display = 'none';
+    document.getElementById('gameSection').style.display = 'block';
+    loadQuestion();
+  } catch(e) {
+    if(!silent) alert('Could not reach server — check connection');
+    if(btn){ btn.disabled=false; btn.textContent='Join Game →'; }
   }
 }
-function renderTeams() {
-  const sorted = [...teams].map((t,i)=>({...t,_i:i})).sort((a,b)=>b.score-a.score);
-  const list = document.getElementById('teams-list');
-  list.innerHTML = sorted.map(t => `
-    <div class="team-row">
-      <span class="team-name">${t.name}</span>
-      <button class="score-adj" onclick="adjustScore(${t._i},-1)">−</button>
-      <span class="team-score">${t.score}</span>
-      <button class="score-adj" onclick="adjustScore(${t._i},1)">+</button>
-      <button class="score-adj" onclick="removeTeam(${t._i})" style="color:#e57373">✕</button>
-    </div>
-  `).join('');
-}
-renderTeams();
 
-// ─────────────────────────────────────────────────────────────────────────────
-// KEYBOARD
-// ─────────────────────────────────────────────────────────────────────────────
-document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT') return;
-  if (currentRound === 0) return;
-  switch(e.key) {
-    case 'ArrowRight': case 'l': nextQ(); break;
-    case 'ArrowLeft':  case 'h': prevQ(); break;
-    case ' ': case 'Enter': e.preventDefault(); revealAnswer(); break;
-    case 'p': case 'P': if(currentRound===3) toggleAudio(); break;
-    case 'f': case 'F': toggleFS(); break;
-    case 's': case 'S': toggleScore(); break;
-    case '1': startRound(1); break;
-    case '2': startRound(2); break;
-    case '3': startRound(3); break;
-  }
-});
+// ── Load current question ─────────────────────────────────────────────────
+async function loadQuestion() {
+  try {
+    const data = await api('/api/current');
+    currentKey = `${data.round}-${data.questionNum-1}`;
+    document.getElementById('playQMeta').textContent = `Round ${data.round} · Q${data.questionNum} of ${data.totalQuestions}`;
+    document.getElementById('playQText').textContent = data.question || 'Waiting for next question…';
+    document.getElementById('playErr').style.display = 'none';
+    const done = answeredKeys[currentKey];
+    document.getElementById('alreadyMsg').style.display  = done ? 'block' : 'none';
+    document.getElementById('submitBtn').style.display   = done ? 'none'  : 'block';
+    document.getElementById('answerText').style.display  = done ? 'none'  : 'block';
+    if(!done) document.getElementById('playFb').style.display = 'none';
+  } catch(e) { document.getElementById('playErr').style.display='block'; }
+}
 
-// ─────────────────────────────────────────────────────────────────────────────
-// FULLSCREEN
-// ─────────────────────────────────────────────────────────────────────────────
-function toggleFS() {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen().catch(()=>{});
-  } else {
-    document.exitFullscreen().catch(()=>{});
-  }
+// ── Submit answer ─────────────────────────────────────────────────────────
+async function submitAnswer() {
+  const answer = document.getElementById('answerText').value.trim();
+  if (!answer) { alert('Type your answer first!'); return; }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled=true; btn.textContent='Scoring…';
+  try {
+    const data = await api('/api/answer','POST',{ team:teamName, answer });
+    if (data.alreadyAnswered) { answeredKeys[currentKey]=true; loadQuestion(); btn.disabled=false; btn.textContent='Submit Answer ✓'; return; }
+    totalScore = data.totalScore;
+    answeredKeys[currentKey] = true;
+    document.getElementById('scoreDisplay').textContent = totalScore;
+    const fb = document.getElementById('playFb');
+    fb.style.display='block';
+    const pts = data.points;
+    fb.className = 'fb '+(pts>=8?'correct':pts>=4?'partial':'wrong');
+    fb.innerHTML = (pts>=8?'✅ Correct!':pts>=4?'🤔 Partial credit!':'❌ Not quite.')
+      +`<span class="badge">+${pts}</span><br><small>${data.feedback}</small>`;
+    document.getElementById('answerText').value='';
+    document.getElementById('answerText').style.display='none';
+    document.getElementById('alreadyMsg').style.display='block';
+    btn.style.display='none';
+  } catch(e) { alert('Submission failed — try again'); }
+  btn.disabled=false; btn.textContent='Submit Answer ✓';
+}
+
+// ── Scoreboard refresh ────────────────────────────────────────────────────
+const medals=['🥇','🥈','🥉'], borders=['gold','silver','bronze'];
+async function refreshScores() {
+  try {
+    const [q, teams] = await Promise.all([ api('/api/current'), api('/api/scores') ]);
+    document.getElementById('sbQMeta').textContent = `Round ${q.round} · Q${q.questionNum} of ${q.totalQuestions}`;
+    document.getElementById('sbQText').textContent = q.question || '—';
+    document.getElementById('sbErr').style.display = 'none';
+    const el = document.getElementById('scoresList');
+    el.innerHTML = teams.length ? teams.map((t,i)=>`
+      <div class="team-row ${borders[i]||''}">
+        <div class="tr-rank">${medals[i]||(i+1)+'.'}</div>
+        <div class="tr-name">${t.name}<br><span class="tr-answers">${t.answers} answers</span></div>
+        <div class="tr-score">${t.score}</div>
+      </div>`).join('') : '<div class="empty">No teams yet!</div>';
+  } catch(e) { document.getElementById('sbErr').style.display='block'; }
+}
+
+// ── Admin refresh ─────────────────────────────────────────────────────────
+async function refreshAdmin() {
+  if (!isAdmin) return;
+  try {
+    const [q, answers, scores] = await Promise.all([
+      api('/api/current', 'GET', null, AKEY),
+      api('/api/admin/answers', 'GET', null, AKEY),
+      api('/api/scores', 'GET', null, AKEY)
+    ]);
+    document.getElementById('adminQMeta').textContent = `Round ${q.round} · Q${q.questionNum} of 15`;
+    document.getElementById('adminQText').textContent = q.question||'—';
+    document.getElementById('adminQAnswer').textContent = '✅ Answer: '+(ANSWERS[q.round-1]?.[q.questionNum-1]||'');
+
+    document.getElementById('ansCount').textContent = `(${(answers.answers||[]).length} submitted)`;
+    const al = document.getElementById('adminAnswers');
+    al.innerHTML = (answers.answers||[]).length ? (answers.answers||[]).map(a=>`
+      <div class="ar">
+        <div class="ar-top">
+          <div class="ar-team">${a.team}</div>
+          <div class="ar-answer">"${a.answer}"</div>
+          <div class="ar-pts">${a.points}</div>
+          <div class="chip ${a.approved?'chip-ok':'chip-ai'}">${a.approved?'✓OK':'AI'}</div>
+        </div>
+        <div class="ar-fb">${a.feedback}</div>
+        <div class="row">
+          <input type="number" id="op_${a.team.replace(/\W/g,'_')}" min="0" max="10" value="${a.points}" style="width:60px">
+          <button class="btn btn-green btn-sm" onclick="override('${a.team}')">Save pts</button>
+        </div>
+      </div>`).join('') : '<div class="empty">No answers submitted yet</div>';
+
+    document.getElementById('adminScores').innerHTML = scores.length ? scores.map((t,i)=>`
+      <div class="team-row ${borders[i]||''}">
+        <div class="tr-rank">${medals[i]||(i+1)+'.'}</div>
+        <div class="tr-name">${t.name}<br><span class="tr-answers">${t.answers} answers</span></div>
+        <div class="tr-score">${t.score}</div>
+      </div>`).join('') : '<div class="empty">No teams yet</div>';
+  } catch(e) { console.error('Admin refresh error',e); }
+}
+
+async function nextQ() {
+  await api('/api/admin/next','POST',null,AKEY);
+  refreshAdmin(); refreshScores(); if(teamName) loadQuestion();
+}
+async function gotoQ() {
+  const r=parseInt(document.getElementById('gotoRound').value);
+  const q=parseInt(document.getElementById('gotoQ').value)-1;
+  await api('/api/admin/goto','POST',{round:r,question:q},AKEY);
+  refreshAdmin(); refreshScores(); if(teamName) loadQuestion();
+}
+async function override(team) {
+  const k='op_'+team.replace(/\W/g,'_');
+  const pts=parseInt(document.getElementById(k).value);
+  await api('/api/admin/override','POST',{team,points:pts},AKEY);
+  refreshAdmin();
+}
+async function resetAll() {
+  if(!confirm('Reset ALL scores? Cannot be undone.')) return;
+  await api('/api/admin/reset','POST',null,AKEY);
+  refreshAdmin(); refreshScores();
+}
+
+// ── Poll loop ─────────────────────────────────────────────────────────────
+function startPolling() {
+  refreshScores();
+  if(isAdmin) refreshAdmin();
+  setInterval(()=>{ refreshScores(); if(isAdmin) refreshAdmin(); if(teamName) loadQuestion(); }, 5000);
 }
 </script>
 </body>
