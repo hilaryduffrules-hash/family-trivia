@@ -2,467 +2,263 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🎉 Family Trivia Night</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0F0F2A;color:#fff;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; min-height: 100vh; }
 
-/* ── Gate ── */
-#gate{position:fixed;inset:0;background:#0F0F2A;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:20px}
-#gate h2{color:#FFD600;font-size:2rem;margin-bottom:6px;text-align:center}
-#gate p{color:#AAAACC;margin-bottom:24px;text-align:center}
-.gate-input{width:100%;max-width:300px;background:#1A1A40;border:2px solid #333355;border-radius:9px;color:#fff;font-size:1rem;padding:12px 14px;outline:none;margin-bottom:10px;display:block}
-.gate-input:focus{border-color:#FFD600}
-.gate-btn{width:100%;max-width:300px;padding:13px;border-radius:9px;border:none;background:#FFD600;color:#0F0F2A;font-size:1.05rem;font-weight:800;cursor:pointer;display:block}
-#gate-err{color:#FF7043;min-height:1.4em;font-size:.88rem;text-align:center;margin-top:8px}
+  /* PASSWORD GATE */
+  #gate { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+  #gate h1 { font-size: 3em; margin-bottom: 10px; }
+  #gate p { color: #aaa; margin-bottom: 30px; font-size: 1.1em; }
+  #gate input { font-size: 1.3em; padding: 15px 25px; border-radius: 12px; border: 2px solid #444; background: #16213e; color: #fff; text-align: center; width: 280px; }
+  #gate input:focus { outline: none; border-color: #e94560; }
+  #gate button { margin-top: 15px; font-size: 1.2em; padding: 12px 40px; border-radius: 12px; border: none; background: #e94560; color: #fff; cursor: pointer; }
+  #gate button:hover { background: #c73a52; }
+  #gate .error { color: #e94560; margin-top: 10px; display: none; }
 
-/* ── Layout tabs ── */
-.tabs{display:flex;background:#111128;border-bottom:2px solid #222244;position:sticky;top:0;z-index:100}
-.tab{flex:1;padding:14px 8px;text-align:center;font-weight:700;font-size:.9rem;color:#AAAACC;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s}
-.tab.active{color:#FFD600;border-bottom-color:#FFD600;background:#0F0F2A}
-.tab-content{display:none;padding:18px 16px;max-width:600px;margin:0 auto}
-.tab-content.active{display:block}
+  /* MAIN APP */
+  #app { display: none; }
 
-/* ── Shared ── */
-.card{background:#1A1A40;border-radius:14px;padding:16px;margin-bottom:12px}
-label,.lbl{display:block;color:#AAAACC;font-size:.72rem;margin-bottom:5px;text-transform:uppercase;letter-spacing:.08em}
-input[type=text],input[type=password],input[type=number],textarea,select{width:100%;background:#0F0F2A;border:2px solid #333355;border-radius:9px;color:#fff;font-size:1rem;padding:10px 13px;outline:none;transition:border-color .2s}
-input:focus,textarea:focus,select:focus{border-color:#FFD600}
-textarea{resize:vertical;min-height:72px}
-.btn{width:100%;padding:13px;border-radius:9px;border:none;background:#FFD600;color:#0F0F2A;font-size:1rem;font-weight:800;cursor:pointer;margin-top:8px;transition:opacity .2s}
-.btn:hover{opacity:.88}
-.btn:disabled{opacity:.4;cursor:not-allowed}
-.btn-blue{background:#29B6F6}
-.btn-green{background:#66BB6A}
-.btn-red{background:#FF7043;color:#fff}
-.btn-sm{padding:7px 14px;font-size:.82rem;width:auto;margin-top:0}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  /* TABS */
+  .tabs { display: flex; background: #16213e; border-bottom: 2px solid #0f3460; }
+  .tab { flex: 1; text-align: center; padding: 16px; font-size: 1.1em; cursor: pointer; transition: background 0.2s; }
+  .tab.active { background: #0f3460; border-bottom: 3px solid #e94560; }
+  .tab:hover { background: #0f3460; }
 
-/* ── Question box ── */
-.q-box{background:#0F0F2A;border:2px solid #29B6F6;border-radius:12px;padding:14px;margin-bottom:12px}
-.q-box .ql{color:#29B6F6;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
-.q-box .qm{color:#AAAACC;font-size:.8rem;margin-bottom:6px}
-.q-box .qt{font-size:1.05rem;font-weight:700;line-height:1.5;white-space:pre-line}
+  /* PANELS */
+  .panel { display: none; padding: 20px; max-width: 600px; margin: 0 auto; }
+  .panel.active { display: block; }
 
-/* ── Feedback ── */
-.fb{display:none;padding:12px;border-radius:10px;margin-top:10px;font-weight:700;font-size:.95rem;text-align:center}
-.fb.correct{background:#1B4332;border:2px solid #66BB6A;color:#66BB6A}
-.fb.partial{background:#3B2800;border:2px solid #FFD600;color:#FFD600}
-.fb.wrong{background:#3B1A1A;border:2px solid #FF7043;color:#FF7043}
-.badge{background:#29B6F6;color:#0F0F2A;border-radius:50px;padding:2px 11px;font-weight:800;font-size:.9rem;display:inline-block;margin-left:5px}
+  /* SUBMIT TAB */
+  .submit-section { text-align: center; padding: 40px 20px; }
+  .submit-section h2 { font-size: 2em; margin-bottom: 15px; }
+  .submit-section p { color: #aaa; margin-bottom: 30px; font-size: 1.1em; }
+  .big-btn { display: inline-block; font-size: 1.5em; padding: 20px 50px; border-radius: 16px; border: none; color: #fff; cursor: pointer; text-decoration: none; font-weight: bold; }
+  .big-btn.green { background: #27ae60; }
+  .big-btn.green:hover { background: #219a52; }
 
-/* ── Score strip ── */
-.score-strip{background:#1A1A40;border-radius:12px;padding:12px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
-.score-strip .val{color:#FFD600;font-size:1.5rem;font-weight:900}
+  /* SCORES TAB */
+  .scores-section h2 { font-size: 1.8em; margin-bottom: 20px; text-align: center; }
+  .add-team { display: flex; gap: 10px; margin-bottom: 20px; }
+  .add-team input { flex: 1; font-size: 1.1em; padding: 12px; border-radius: 10px; border: 2px solid #444; background: #16213e; color: #fff; }
+  .add-team input:focus { outline: none; border-color: #e94560; }
+  .add-team button { font-size: 1.1em; padding: 12px 20px; border-radius: 10px; border: none; background: #e94560; color: #fff; cursor: pointer; white-space: nowrap; }
 
-/* ── Scoreboard ── */
-.team-row{background:#0F0F2A;border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px}
-.team-row.gold{border:2px solid #FFD600}
-.team-row.silver{border:2px solid #AAAACC}
-.team-row.bronze{border:2px solid #FF7043}
-.tr-rank{font-size:1.6rem;width:36px;text-align:center}
-.tr-name{flex:1;font-weight:700}
-.tr-score{color:#FFD600;font-size:1.4rem;font-weight:900}
-.tr-answers{color:#AAAACC;font-size:.75rem}
+  .team-card { background: #16213e; border-radius: 14px; padding: 16px 20px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+  .team-name { font-size: 1.3em; font-weight: bold; flex: 1; }
+  .team-score { font-size: 2.5em; font-weight: bold; min-width: 60px; text-align: center; color: #f5c518; }
+  .score-btns { display: flex; flex-direction: column; gap: 4px; margin-left: 12px; }
+  .score-btns button { width: 44px; height: 44px; border-radius: 10px; border: none; font-size: 1.4em; cursor: pointer; font-weight: bold; }
+  .btn-plus { background: #27ae60; color: #fff; }
+  .btn-minus { background: #e74c3c; color: #fff; }
+  .btn-remove { background: #333; color: #888; font-size: 0.8em !important; margin-top: 4px; }
+  .btn-plus:hover { background: #219a52; }
+  .btn-minus:hover { background: #c0392b; }
 
-/* ── Admin answers ── */
-.ar{background:#0F0F2A;border-radius:9px;padding:11px 13px;margin-bottom:8px}
-.ar-top{display:flex;gap:10px;align-items:center;margin-bottom:6px}
-.ar-team{font-weight:800;font-size:.9rem}
-.ar-answer{color:#DDDDE8;font-size:.88rem;flex:1}
-.ar-pts{color:#FFD600;font-weight:900;font-size:1.1rem;min-width:28px;text-align:right}
-.ar-fb{color:#AAAACC;font-size:.75rem;margin-bottom:6px}
-.ar-correct{color:#66BB6A;font-size:.8rem;margin-bottom:8px;font-weight:600}
-.chip{display:inline-block;padding:2px 8px;border-radius:50px;font-size:.7rem;font-weight:700}
-.chip-ai{background:#3B2800;color:#FFD600}
-.chip-ok{background:#1B4332;color:#66BB6A}
-.empty{color:#AAAACC;font-size:.9rem;text-align:center;padding:20px}
-.pulse{animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-.conn-err{color:#FF7043;font-size:.8rem;text-align:center;margin-top:6px;display:none}
+  .no-teams { text-align: center; color: #666; padding: 40px; font-size: 1.1em; }
+
+  /* ADMIN SECTION */
+  .admin-section { margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; }
+  .admin-section h3 { color: #888; margin-bottom: 10px; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; }
+  .admin-btn { font-size: 0.9em; padding: 8px 16px; border-radius: 8px; border: 1px solid #444; background: transparent; color: #aaa; cursor: pointer; margin-right: 8px; margin-bottom: 8px; }
+  .admin-btn:hover { border-color: #e94560; color: #e94560; }
+
+  /* ANSWERS TAB (admin only) */
+  .answers-section { text-align: center; padding: 40px 20px; }
+  .answers-section h2 { font-size: 1.8em; margin-bottom: 15px; }
+  .answers-section p { color: #aaa; margin-bottom: 20px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 480px) {
+    #gate h1 { font-size: 2em; }
+    .big-btn { font-size: 1.2em; padding: 16px 30px; }
+    .team-score { font-size: 2em; }
+  }
 </style>
 </head>
 <body>
 
-<!-- Gate -->
+<!-- PASSWORD GATE -->
 <div id="gate">
-  <h2>🎉 Family Trivia Night</h2>
-  <p>Enter tonight's password to join</p>
-  <input class="gate-input" type="password" id="gate-input" placeholder="Password" autocomplete="off">
-  <button class="gate-btn" onclick="checkGate()">Enter →</button>
-  <div id="gate-err"></div>
+  <h1>🎉 Trivia Night</h1>
+  <p>Enter the password to join</p>
+  <input type="password" id="pwInput" placeholder="Password..." autofocus>
+  <button onclick="tryLogin()">Enter</button>
+  <p class="error" id="pwError">Wrong password, try again!</p>
 </div>
 
-<!-- Tabs -->
-<div class="tabs">
-  <div class="tab active" onclick="showTab('play')">🎮 Play</div>
-  <div class="tab" onclick="showTab('scores')">📊 Scores</div>
-  <div class="tab" id="adminTab" onclick="showTab('admin')" style="display:none">🔧 Admin</div>
-  <div class="tab" id="adminUnlock" onclick="promptAdmin()" style="color:#555577;font-size:.8rem">🔑</div>
-</div>
-
-<!-- ══ PLAY TAB ══════════════════════════════════════════════════════════ -->
-<div class="tab-content active" id="tab-play">
-
-  <div class="score-strip" id="scoreStrip" style="display:none">
-    <div><div class="lbl">Team</div><div style="font-weight:700;font-size:.95rem" id="teamDisplay">—</div></div>
-    <div style="text-align:right"><div class="lbl">Score</div><div class="val" id="scoreDisplay">0</div></div>
+<!-- MAIN APP -->
+<div id="app">
+  <div class="tabs">
+    <div class="tab active" data-tab="submit" onclick="switchTab('submit')">📝 Submit Answer</div>
+    <div class="tab" data-tab="scores" onclick="switchTab('scores')">📊 Scores</div>
+    <div class="tab" data-tab="answers" onclick="switchTab('answers')" id="answersTab" style="display:none">📋 Answers</div>
   </div>
 
-  <div class="card" id="joinCard">
-    <label>Your Team Name</label>
-    <input type="text" id="teamName" placeholder="e.g. The Murphys" maxlength="30">
-    <button class="btn" id="joinBtn" onclick="registerTeam()">Join Game →</button>
+  <!-- SUBMIT PANEL -->
+  <div class="panel active" id="panel-submit">
+    <div class="submit-section">
+      <h2>📝 Submit Your Answer</h2>
+      <p>Tap the button below to submit your team's answer for the current question.</p>
+      <a id="formLink" class="big-btn green" href="#" target="_blank">Open Answer Form →</a>
+      <p style="margin-top: 20px; color: #666; font-size: 0.9em;">Opens Google Forms in a new tab</p>
+    </div>
   </div>
 
-  <div id="gameSection" style="display:none">
-    <div class="q-box">
-      <div class="ql">Current Question</div>
-      <div class="qm" id="playQMeta">—</div>
-      <div class="qt" id="playQText">Loading…</div>
-      <div id="clipPlayer" style="display:none;margin-top:14px">
-        <button onclick="toggleClip()" id="clipBtn" style="
-          background:#66BB6A;color:#0F0F2A;border:none;border-radius:50px;
-          padding:10px 24px;font-size:1rem;font-weight:800;cursor:pointer;
-          display:flex;align-items:center;gap:8px;transition:background .2s">
-          <span id="clipIcon">▶</span><span id="clipLabel">Play Clip</span>
-        </button>
+  <!-- SCORES PANEL -->
+  <div class="panel" id="panel-scores">
+    <div class="scores-section">
+      <h2>📊 Scoreboard</h2>
+      <div class="add-team" id="addTeamSection" style="display:none">
+        <input type="text" id="teamNameInput" placeholder="Team name..." onkeydown="if(event.key==='Enter')addTeam()">
+        <button onclick="addTeam()">+ Add</button>
+      </div>
+      <div id="teamsList"></div>
+      <div class="admin-section" id="adminSection" style="display:none">
+        <h3>Admin Controls</h3>
+        <button class="admin-btn" onclick="resetScores()">🔄 Reset All Scores</button>
+        <button class="admin-btn" onclick="clearTeams()">🗑️ Clear All Teams</button>
       </div>
     </div>
-    <div class="card">
-      <label>Your Answer</label>
-      <textarea id="answerText" placeholder="Type your answer…" rows="3"></textarea>
-      <div id="alreadyMsg" style="display:none;color:#66BB6A;font-size:.85rem;margin-top:8px">✅ Already answered this question!</div>
-      <button class="btn" id="submitBtn" onclick="submitAnswer()">Submit Answer ✓</button>
-      <div class="fb" id="playFb"></div>
+  </div>
+
+  <!-- ANSWERS PANEL (admin only) -->
+  <div class="panel" id="panel-answers">
+    <div class="answers-section">
+      <h2>📋 View Submitted Answers</h2>
+      <p>Open the Google Sheet to see all submitted answers.</p>
+      <a id="sheetLink" class="big-btn green" href="#" target="_blank" style="background: #3498db;">Open Answer Sheet →</a>
+      <p style="margin-top: 20px; color: #666; font-size: 0.9em;">Opens Google Sheets in a new tab</p>
     </div>
-    <div class="conn-err" id="playErr">⚠ Connection issue — retrying…</div>
-  </div>
-</div>
-
-<!-- ══ SCORES TAB ════════════════════════════════════════════════════════ -->
-<div class="tab-content" id="tab-scores">
-  <div class="q-box">
-    <div class="ql">Question on Screen</div>
-    <div class="qm" id="sbQMeta">—</div>
-    <div class="qt" id="sbQText">Loading…</div>
-  </div>
-  <div id="scoresList"><div class="empty pulse">Waiting for teams…</div></div>
-  <div class="conn-err" id="sbErr">⚠ Connection issue — retrying…</div>
-</div>
-
-<!-- ══ ADMIN TAB ══════════════════════════════════════════════════════════ -->
-<div class="tab-content" id="tab-admin">
-
-  <!-- Current Q + nav -->
-  <div class="card">
-    <div class="lbl" style="margin-bottom:10px">Current Question</div>
-    <div class="q-box" style="margin-bottom:10px">
-      <div class="qm" id="adminQMeta">—</div>
-      <div class="qt" id="adminQText">—</div>
-      <div style="color:#66BB6A;font-size:.82rem;margin-top:6px;font-weight:600" id="adminQAnswer"></div>
-    </div>
-    <div class="row">
-      <button class="btn btn-blue btn-sm" onclick="nextQ()">▶ Next Question</button>
-      <select id="gotoRound" style="flex:1">
-        <option value="1">Round 1 — General</option>
-        <option value="2">Round 2 — Cartoons</option>
-        <option value="3">Round 3 — Name That Tune</option>
-      </select>
-      <input type="number" id="gotoQ" min="1" max="15" value="1" style="width:58px">
-      <button class="btn btn-sm" onclick="gotoQ()" style="background:#AAAACC;color:#0F0F2A">Go</button>
-    </div>
-  </div>
-
-  <!-- Answers this question -->
-  <div class="card">
-    <div class="lbl" style="margin-bottom:10px">Submitted Answers <span id="ansCount" style="color:#AAAACC;font-weight:400"></span></div>
-    <div id="adminAnswers"><div class="empty">No answers yet</div></div>
-  </div>
-
-  <!-- Scores -->
-  <div class="card">
-    <div class="lbl" style="margin-bottom:10px">Live Scores</div>
-    <div id="adminScores"><div class="empty">No teams yet</div></div>
-  </div>
-
-  <!-- Reset -->
-  <div class="card" style="border:1px solid #FF7043">
-    <button class="btn btn-red btn-sm" onclick="resetAll()">🗑 Reset All Scores</button>
   </div>
 </div>
 
 <script>
-const API  = 'https://trivia-tonight.loca.lt';
-const PKEY = 'carlysbirthday';
-const AKEY = 'hilary21';
+// === CONFIG ===
+// REPLACE THESE AFTER CREATING THE GOOGLE FORM
+const FORM_URL = 'FORM_URL_PLACEHOLDER';
+const SHEET_URL = 'SHEET_URL_PLACEHOLDER';
 
-let teamName = '', totalScore = 0, answeredKeys = {}, currentKey = '';
+const PLAYER_PW = 'carlysbirthday';
+const ADMIN_PW = 'hilary21';
+
 let isAdmin = false;
-let activeTab = 'play';
-let currentAudio = null, currentClipUrl = '';
+let teams = JSON.parse(localStorage.getItem('triviaTeams') || '[]');
 
-// ── Correct answers (for admin display) ───────────────────────────────────
-const ANSWERS = [
-  ["1989","Gold","206","Andorra","The mitochondria","2007","Julius Caesar","Antarctica","The femur","France","12","Saturn","1998","Tea","SOS"],
-  ["Appa","1995","Robin Williams","Buddy Pine","Auguste Gusteau","Sid Phillips","Rufus","Waste Allocation Load Lifter Earth-Class","A meerkat","Joy, Sadness, Anger, Fear, Disgust","Cynthia","Mr. Krabs","Casita","Bandit","Doofenshmirtz Evil Incorporated!"],
-  ["Poor Unfortunate Souls – The Little Mermaid","For the First Time in Forever – Frozen","I Won't Say I'm in Love – Hercules","Can You Feel the Love Tonight – The Lion King","Colors of the Wind – Pocahontas","Go the Distance – Hercules","Friend Like Me – Aladdin","How Far I'll Go – Moana","Shiny – Moana","When She Loved Me – Toy Story 2","This Is Halloween – Nightmare Before Christmas","Surface Pressure – Encanto","Try Everything – Zootopia","Mother Knows Best – Tangled","Touch the Sky – Brave"]
-];
-
-// ── Gate ──────────────────────────────────────────────────────────────────
-document.getElementById('gate-input').addEventListener('keydown', e => { if(e.key==='Enter') checkGate(); });
-
-// Auto-restore session
-(function init() {
-  const auth = sessionStorage.getItem('ta');
-  if (auth) {
-    document.getElementById('gate').style.display = 'none';
-    if (auth === 'admin') { isAdmin = true; document.getElementById('adminTab').style.display = ''; document.getElementById('adminUnlock').style.display = 'none'; }
-    const saved = localStorage.getItem('trivia_team');
-    if (saved) { document.getElementById('teamName').value = saved; registerTeam(true); }
-    startPolling();
-  }
-})();
-
-function checkGate() {
-  const v = document.getElementById('gate-input').value.trim();
-  if (v === AKEY) {
+// === PASSWORD ===
+function tryLogin() {
+  const pw = document.getElementById('pwInput').value;
+  if (pw === ADMIN_PW) {
     isAdmin = true;
-    sessionStorage.setItem('ta','admin');
-    document.getElementById('adminTab').style.display = '';
-    document.getElementById('gate').style.display = 'none';
-    const saved = localStorage.getItem('trivia_team');
-    if (saved) { document.getElementById('teamName').value = saved; registerTeam(true); }
-    startPolling();
-  } else if (v.toLowerCase() === PKEY) {
-    sessionStorage.setItem('ta','player');
-    document.getElementById('gate').style.display = 'none';
-    const saved = localStorage.getItem('trivia_team');
-    if (saved) { document.getElementById('teamName').value = saved; registerTeam(true); }
-    startPolling();
+    enterApp();
+  } else if (pw === PLAYER_PW) {
+    isAdmin = false;
+    enterApp();
   } else {
-    document.getElementById('gate-err').textContent = 'Wrong password — try again';
+    document.getElementById('pwError').style.display = 'block';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
   }
 }
 
-function stopClip() {
-  if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; }
-  const btn = document.getElementById('clipBtn');
-  if (btn) { btn.style.background='#66BB6A'; document.getElementById('clipIcon').textContent='▶'; document.getElementById('clipLabel').textContent='Play Clip'; }
+document.getElementById('pwInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') tryLogin();
+});
+
+function enterApp() {
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('formLink').href = FORM_URL;
+
+  if (isAdmin) {
+    document.getElementById('addTeamSection').style.display = 'flex';
+    document.getElementById('adminSection').style.display = 'block';
+    document.getElementById('answersTab').style.display = '';
+    document.getElementById('sheetLink').href = SHEET_URL;
+  }
+  renderTeams();
 }
 
-function toggleClip() {
-  if (currentAudio && !currentAudio.paused) { stopClip(); return; }
-  stopClip();
-  currentAudio = new Audio(currentClipUrl);
-  currentAudio.play().catch(e => alert('Audio error: ' + e.message));
-  const btn = document.getElementById('clipBtn');
-  btn.style.background = '#FF7043';
-  document.getElementById('clipIcon').textContent = '⏹';
-  document.getElementById('clipLabel').textContent = 'Playing… (tap to stop)';
-  currentAudio.onended = stopClip;
+// === TABS ===
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+  document.getElementById(`panel-${tab}`).classList.add('active');
 }
 
-function promptAdmin() {
-  if (isAdmin) { showTab('admin'); return; }
-  const pw = prompt('Admin password:');
-  if (pw === 'hilary21') {
-    isAdmin = true;
-    sessionStorage.setItem('ta','admin');
-    document.getElementById('adminTab').style.display = '';
-    document.getElementById('adminUnlock').style.display = 'none';
-    showTab('admin');
-    startPolling();
-  } else if (pw !== null) {
-    alert('Wrong password');
+// === TEAMS & SCORES ===
+function saveTeams() {
+  localStorage.setItem('triviaTeams', JSON.stringify(teams));
+}
+
+function addTeam() {
+  const input = document.getElementById('teamNameInput');
+  const name = input.value.trim();
+  if (!name) return;
+  teams.push({ name, score: 0 });
+  saveTeams();
+  renderTeams();
+  input.value = '';
+  input.focus();
+}
+
+function changeScore(idx, delta) {
+  teams[idx].score += delta;
+  saveTeams();
+  renderTeams();
+}
+
+function removeTeam(idx) {
+  if (confirm(`Remove "${teams[idx].name}"?`)) {
+    teams.splice(idx, 1);
+    saveTeams();
+    renderTeams();
   }
 }
 
-// ── Tabs ──────────────────────────────────────────────────────────────────
-function showTab(t) {
-  activeTab = t;
-  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', ['play','scores','admin'][i]===t));
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.getElementById('tab-'+t).classList.add('active');
-}
-
-// ── API helper ─────────────────────────────────────────────────────────────
-async function api(path, method='GET', body=null, key=PKEY) {
-  const opts = { method, headers:{'Content-Type':'application/json','x-api-key':key} };
-  if (body) opts.body = JSON.stringify(body);
-  const res = await fetch(API+path, opts);
-  if (!res.ok) throw new Error(res.status);
-  return res.json();
-}
-
-// ── Register team ─────────────────────────────────────────────────────────
-async function registerTeam(silent=false) {
-  const name = document.getElementById('teamName').value.trim();
-  if (!name) { if(!silent) alert('Enter your team name!'); return; }
-  const btn = document.getElementById('joinBtn');
-  if(btn){ btn.disabled=true; btn.textContent='Joining…'; }
-  try {
-    const data = await api('/api/register','POST',{ team:name });
-    teamName = data.name;
-    totalScore = data.score;
-    answeredKeys = {};
-    (data.answeredQuestions||[]).forEach(k => answeredKeys[k]=true);
-    localStorage.setItem('trivia_team', teamName);
-    document.getElementById('teamDisplay').textContent = teamName;
-    document.getElementById('scoreDisplay').textContent = totalScore;
-    document.getElementById('scoreStrip').style.display = 'flex';
-    document.getElementById('joinCard').style.display = 'none';
-    document.getElementById('gameSection').style.display = 'block';
-    loadQuestion();
-  } catch(e) {
-    if(!silent) alert('Could not reach server — check connection');
-    if(btn){ btn.disabled=false; btn.textContent='Join Game →'; }
+function resetScores() {
+  if (confirm('Reset all scores to 0?')) {
+    teams.forEach(t => t.score = 0);
+    saveTeams();
+    renderTeams();
   }
 }
 
-// ── Load current question ─────────────────────────────────────────────────
-async function loadQuestion() {
-  try {
-    const data = await api('/api/current');
-    currentKey = `${data.round}-${data.questionNum-1}`;
-    document.getElementById('playQMeta').textContent = `Round ${data.round} · Q${data.questionNum} of ${data.totalQuestions}`;
-    document.getElementById('playQText').textContent = data.question || 'Waiting for next question…';
-    document.getElementById('playErr').style.display = 'none';
-
-    // Round 3 audio clip
-    const clipNum = String(data.questionNum).padStart(2,'0');
-    const clipPlayer = document.getElementById('clipPlayer');
-    if (data.round === 3 && data.question) {
-      clipPlayer.style.display = 'block';
-      currentClipUrl = `${API}/audio/clip_${clipNum}.mp3`;
-      stopClip();
-    } else {
-      clipPlayer.style.display = 'none';
-      stopClip();
-    }
-    const done = answeredKeys[currentKey];
-    document.getElementById('alreadyMsg').style.display  = done ? 'block' : 'none';
-    document.getElementById('submitBtn').style.display   = done ? 'none'  : 'block';
-    document.getElementById('answerText').style.display  = done ? 'none'  : 'block';
-    document.getElementById('playFb').style.display = 'none';
-  } catch(e) { document.getElementById('playErr').style.display='block'; }
+function clearTeams() {
+  if (confirm('Remove ALL teams?')) {
+    teams = [];
+    saveTeams();
+    renderTeams();
+  }
 }
 
-// ── Submit answer ─────────────────────────────────────────────────────────
-async function submitAnswer() {
-  const answer = document.getElementById('answerText').value.trim();
-  if (!answer) { alert('Type your answer first!'); return; }
-  const btn = document.getElementById('submitBtn');
-  btn.disabled=true; btn.textContent='Scoring…';
-  try {
-    const data = await api('/api/answer','POST',{ team:teamName, answer });
-    if (data.alreadyAnswered) {
-      answeredKeys[currentKey]=true;
-      document.getElementById('playFb').style.display='none';
-      loadQuestion(); btn.disabled=false; btn.textContent='Submit Answer ✓'; return;
-    }
-    totalScore = data.totalScore;
-    answeredKeys[currentKey] = true;
-    document.getElementById('scoreDisplay').textContent = totalScore;
-    const fb = document.getElementById('playFb');
-    fb.style.display='block';
-    const pts = data.points;
-    fb.className = 'fb '+(pts>=8?'correct':pts>=4?'partial':'wrong');
-    fb.innerHTML = (pts>=8?'✅ Correct!':pts>=4?'🤔 Partial credit!':'❌ Not quite.')
-      +`<span class="badge">+${pts}</span><br><small>${data.feedback}</small>`;
-    document.getElementById('answerText').value='';
-    document.getElementById('answerText').style.display='none';
-    document.getElementById('alreadyMsg').style.display='block';
-    btn.style.display='none';
-  } catch(e) { alert('Submission failed — try again'); }
-  btn.disabled=false; btn.textContent='Submit Answer ✓';
+function renderTeams() {
+  const el = document.getElementById('teamsList');
+  if (teams.length === 0) {
+    el.innerHTML = '<div class="no-teams">No teams yet' + (isAdmin ? ' — add one above!' : '') + '</div>';
+    return;
+  }
+  // Sort by score descending for display
+  const sorted = teams.map((t, i) => ({ ...t, idx: i })).sort((a, b) => b.score - a.score);
+  el.innerHTML = sorted.map(t => `
+    <div class="team-card">
+      <div class="team-name">${escHtml(t.name)}</div>
+      <div class="team-score">${t.score}</div>
+      ${isAdmin ? `
+      <div class="score-btns">
+        <button class="btn-plus" onclick="changeScore(${t.idx}, 1)">+</button>
+        <button class="btn-minus" onclick="changeScore(${t.idx}, -1)">−</button>
+        <button class="btn-remove" onclick="removeTeam(${t.idx})">✕</button>
+      </div>` : ''}
+    </div>
+  `).join('');
 }
 
-// ── Scoreboard refresh ────────────────────────────────────────────────────
-const medals=['🥇','🥈','🥉'], borders=['gold','silver','bronze'];
-async function refreshScores() {
-  try {
-    const [q, teams] = await Promise.all([ api('/api/current'), api('/api/scores') ]);
-    document.getElementById('sbQMeta').textContent = `Round ${q.round} · Q${q.questionNum} of ${q.totalQuestions}`;
-    document.getElementById('sbQText').textContent = q.question || '—';
-    document.getElementById('sbErr').style.display = 'none';
-    const el = document.getElementById('scoresList');
-    el.innerHTML = teams.length ? teams.map((t,i)=>`
-      <div class="team-row ${borders[i]||''}">
-        <div class="tr-rank">${medals[i]||(i+1)+'.'}</div>
-        <div class="tr-name">${t.name}<br><span class="tr-answers">${t.answers} answers</span></div>
-        <div class="tr-score">${t.score}</div>
-      </div>`).join('') : '<div class="empty">No teams yet!</div>';
-  } catch(e) { document.getElementById('sbErr').style.display='block'; }
-}
-
-// ── Admin refresh ─────────────────────────────────────────────────────────
-async function refreshAdmin() {
-  if (!isAdmin) return;
-  try {
-    const [q, answers, scores] = await Promise.all([
-      api('/api/current', 'GET', null, AKEY),
-      api('/api/admin/answers', 'GET', null, AKEY),
-      api('/api/scores', 'GET', null, AKEY)
-    ]);
-    document.getElementById('adminQMeta').textContent = `Round ${q.round} · Q${q.questionNum} of 15`;
-    document.getElementById('adminQText').textContent = q.question||'—';
-    document.getElementById('adminQAnswer').textContent = '✅ Answer: '+(ANSWERS[q.round-1]?.[q.questionNum-1]||'');
-
-    document.getElementById('ansCount').textContent = `(${(answers.answers||[]).length} submitted)`;
-    const al = document.getElementById('adminAnswers');
-    al.innerHTML = (answers.answers||[]).length ? (answers.answers||[]).map(a=>`
-      <div class="ar">
-        <div class="ar-top">
-          <div class="ar-team">${a.team}</div>
-          <div class="ar-answer">"${a.answer}"</div>
-          <div class="ar-pts">${a.points}</div>
-          <div class="chip ${a.approved?'chip-ok':'chip-ai'}">${a.approved?'✓OK':'AI'}</div>
-        </div>
-        <div class="ar-fb">${a.feedback}</div>
-        <div class="row">
-          <input type="number" id="op_${a.team.replace(/\W/g,'_')}" min="0" max="10" value="${a.points}" style="width:60px">
-          <button class="btn btn-green btn-sm" onclick="override('${a.team}')">Save pts</button>
-        </div>
-      </div>`).join('') : '<div class="empty">No answers submitted yet</div>';
-
-    document.getElementById('adminScores').innerHTML = scores.length ? scores.map((t,i)=>`
-      <div class="team-row ${borders[i]||''}">
-        <div class="tr-rank">${medals[i]||(i+1)+'.'}</div>
-        <div class="tr-name">${t.name}<br><span class="tr-answers">${t.answers} answers</span></div>
-        <div class="tr-score">${t.score}</div>
-      </div>`).join('') : '<div class="empty">No teams yet</div>';
-  } catch(e) { console.error('Admin refresh error',e); }
-}
-
-async function nextQ() {
-  await api('/api/admin/next','POST',null,AKEY);
-  refreshAdmin(); refreshScores(); if(teamName) loadQuestion();
-}
-async function gotoQ() {
-  const r=parseInt(document.getElementById('gotoRound').value);
-  const q=parseInt(document.getElementById('gotoQ').value)-1;
-  await api('/api/admin/goto','POST',{round:r,question:q},AKEY);
-  refreshAdmin(); refreshScores(); if(teamName) loadQuestion();
-}
-async function override(team) {
-  const k='op_'+team.replace(/\W/g,'_');
-  const pts=parseInt(document.getElementById(k).value);
-  await api('/api/admin/override','POST',{team,points:pts},AKEY);
-  refreshAdmin();
-}
-async function resetAll() {
-  if(!confirm('Reset ALL scores? Cannot be undone.')) return;
-  await api('/api/admin/reset','POST',null,AKEY);
-  refreshAdmin(); refreshScores();
-}
-
-// ── Poll loop ─────────────────────────────────────────────────────────────
-function startPolling() {
-  refreshScores();
-  if(isAdmin) refreshAdmin();
-  setInterval(()=>{ refreshScores(); if(isAdmin) refreshAdmin(); if(teamName) loadQuestion(); }, 5000);
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 </script>
 </body>
